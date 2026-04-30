@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotoRun — Solicite sua Corrida</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #141414;
+  --surface2: #1c1c1c;
+  --border: #2a2a2a;
+  --accent: #f97316;
+  --accent2: #fb923c;
+  --accent-dim: #7c3912;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --text: #f5f5f5;
+  --text-2: #a3a3a3;
+  --text-3: #525252;
+  --white: #ffffff;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 1000;
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.logo span { color: var(--accent); }
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(34,197,94,0.5);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.6; transform:scale(0.85); }
+}
+
+/* ── MAIN LAYOUT ── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 380px;
+  min-width: 380px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+}
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* ── MAP ── */
+#map {
+  flex: 1;
+  background: #111;
+}
+
+/* ── SECTION TITLES ── */
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── INPUT GROUPS ── */
+.input-group {
+  margin-bottom: 10px;
+  position: relative;
+}
+.input-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dot-a { color: var(--green); }
+.dot-b { color: var(--red); }
+.dot-stop { color: var(--yellow); }
+
+.input-field {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 11px 40px 11px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+}
+.input-field::placeholder { color: var(--text-3); }
+
+.input-action {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 26px; height: 26px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+}
+.input-action:hover { background: var(--accent2); transform: scale(1.05); }
+.input-action.remove { background: #2a1515; color: var(--red); }
+.input-action.remove:hover { background: var(--red); color: white; }
+
+/* autocomplete dropdown */
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  z-index: 9999;
+  max-height: 180px;
+  overflow-y: auto;
+  display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.autocomplete-list.open { display: block; }
+.ac-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  line-height: 1.4;
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover { background: rgba(249,115,22,0.1); color: var(--accent); }
+.ac-item small { color: var(--text-3); font-size: 11px; display: block; }
+
+/* ── STOPS ── */
+.stops-container { margin-bottom: 10px; }
+.stop-wrapper { position: relative; margin-bottom: 10px; }
+
+.add-stop-btn {
+  width: 100%;
+  padding: 9px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.add-stop-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(249,115,22,0.05);
+}
+.add-stop-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── ROUTE CONNECTOR ── */
+.route-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -4px 0 6px 6px;
+}
+.route-line-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+.route-line-bar {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+/* ── INFO CARD ── */
+.info-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 14px;
+}
+.info-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+.info-row .key { color: var(--text-2); font-size: 13px; }
+.info-row .val { font-weight: 600; color: var(--text); }
+.info-row .val.price { color: var(--accent); font-size: 20px; font-family: 'Syne', sans-serif; }
+.info-row .val.green { color: var(--green); }
+
+/* price breakdown */
+.price-breakdown {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* ── PERSONAL INFO ── */
+.personal-section { margin-bottom: 16px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── NOTE ── */
+textarea.input-field {
+  resize: none;
+  height: 70px;
+  padding: 10px 14px;
+  line-height: 1.5;
+}
+
+/* ── SUBMIT BTN ── */
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.submit-btn::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+}
+.submit-btn:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(249,115,22,0.35); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 12px 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(34,197,94,0.3); }
+.toast.error { border-color: rgba(239,68,68,0.3); }
+
+/* ── SUCCESS OVERLAY ── */
+.success-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.success-overlay.show { display: flex; }
+.success-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  animation: modalIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.85); }
+  to { opacity:1; transform:scale(1); }
+}
+.success-icon-wrap {
+  width: 72px; height: 72px;
+  background: rgba(34,197,94,0.1);
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 20px;
+  animation: iconPop 0.5s 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+@keyframes iconPop { from{transform:scale(0)} to{transform:scale(1)} }
+.success-modal h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.success-modal p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+.success-detail {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  text-align: left;
+  margin-bottom: 24px;
+}
+.sd-row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
+.sd-row .k { color: var(--text-3); }
+.sd-row .v { font-weight:600; }
+.sd-row .v.or { color:var(--accent); }
+.new-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.new-btn:hover { background: var(--accent2); }
+
+/* ── CALCULATING STATE ── */
+.calculating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-2);
+  font-size: 13px;
+  padding: 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── LEAFLET CUSTOM ── */
+.leaflet-container { background: #111 !important; }
+
+/* custom markers */
+.marker-pin {
+  width: 32px; height: 32px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.marker-pin span {
+  transform: rotate(45deg);
+  font-size: 14px;
+  display: block;
+}
+.pin-a { background: var(--green); }
+.pin-b { background: var(--red); }
+.pin-stop { background: var(--yellow); }
+
+/* mobile */
+@media (max-width: 768px) {
+  .main { flex-direction: column; overflow: auto; }
+  .sidebar { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); max-height: none; overflow: visible; }
+  .sidebar-scroll { overflow: visible; }
+  #map { height: 300px; flex: none; }
+  body { overflow: auto; }
+  html, body { height: auto; }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🏍</div>
+    Moto<span>Run</span>
+  </div>
+  <div class="status-badge">
+    <div class="status-dot"></div>
+    Disponível agora
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-scroll">
+
+      <!-- ROUTE SECTION -->
+      <div class="section-title">📍 Rota</div>
+
+      <!-- ORIGIN -->
+      <div class="input-group" id="grp-origin">
+        <div class="input-label"><span class="dot-a">●</span> Ponto de Partida</div>
+        <input class="input-field" id="origin" placeholder="Digite o endereço de origem..." autocomplete="off" oninput="onAddressInput(this, 'ac-origin')">
+        <button class="input-action" title="Usar minha localização" onclick="useMyLocation()">📍</button>
+        <div class="autocomplete-list" id="ac-origin"></div>
+      </div>
+
+      <div class="route-line"><div class="route-line-dot"></div><div class="route-line-bar"></div></div>
+
+      <!-- STOPS -->
+      <div class="stops-container" id="stopsContainer"></div>
+
+      <!-- DESTINATION -->
+      <div class="input-group" id="grp-dest">
+        <div class="input-label"><span class="dot-b">●</span> Destino Final</div>
+        <input class="input-field" id="dest" placeholder="Digite o destino..." autocomplete="off" oninput="onAddressInput(this, 'ac-dest')">
+        <div class="autocomplete-list" id="ac-dest"></div>
+      </div>
+
+      <!-- ADD STOP BTN -->
+      <button class="add-stop-btn" id="addStopBtn" onclick="addStop()">
+        + Adicionar Parada <span id="stopCountLabel">(0/3)</span>
+      </button>
+
+      <!-- CALCULATING -->
+      <div class="calculating" id="calcState" style="display:none">
+        <div class="spinner"></div>
+        Calculando rota e distância...
+      </div>
+
+      <!-- ROUTE INFO -->
+      <div id="routeInfo" style="display:none">
+        <div class="section-title">📊 Resumo da Corrida</div>
+        <div class="info-card">
+          <div class="info-row">
+            <span class="key">🛣️ Distância total</span>
+            <span class="val" id="infoDistance">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">⏱️ Tempo estimado</span>
+            <span class="val green" id="infoDuration">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">🛑 Paradas</span>
+            <span class="val" id="infoStops">—</span>
+          </div>
+          <div class="info-row" style="border-bottom:none">
+            <span class="key">💰 Valor da corrida</span>
+            <div>
+              <span class="val price" id="infoPrice">—</span>
+              <div class="price-breakdown" id="priceBreakdown"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONAL INFO -->
+      <div class="section-title">👤 Seus Dados</div>
+      <div class="personal-section">
+        <div class="two-col" style="margin-bottom:10px">
+          <div class="input-group" style="margin-bottom:0">
+            <div class="input-label">Nome</div>
+            <input class="input-field" id="clientName" placeholder="Seu nome">
+          </div>
+          <div class="input-group" style="margin-bottom:0">
+            <div class="input-label">Telefone / WhatsApp</div>
+            <input class="input-field" id="clientPhone" placeholder="(00) 00000-0000" oninput="phoneMask(this)">
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Observações (opcional)</div>
+          <textarea class="input-field" id="clientNote" placeholder="Ex: Precisa de nota fiscal, entrega no portão, frágil..."></textarea>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <button class="submit-btn" id="submitBtn" onclick="submitRequest()">
+        🏍️ Solicitar Corrida
+      </button>
+      <div style="font-size:11px;color:var(--text-3);text-align:center;padding-bottom:8px">
+        Você receberá confirmação via WhatsApp
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-modal">
+    <div class="success-icon-wrap">✓</div>
+    <h2>Corrida Solicitada!</h2>
+    <p>Sua solicitação foi enviada com sucesso. O motoboy já foi notificado e entrará em contato em breve.</p>
+    <div class="success-detail" id="successDetail"></div>
+    <button class="new-btn" onclick="resetAll()">+ Nova Solicitação</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIGURAÇÃO
+// ═══════════════════════════════════════════════════════
+// 1. Obtenha sua chave GRATUITA em: https://openrouteservice.org/dev/#/signup
+// 2. Substitua abaixo:
+const ORS_KEY = "SUA_CHAVE_ORS_AQUI";
+
+// Número do WhatsApp do motoboy (com DDI, sem símbolos)
+const WHATSAPP_NUMBER = "85999888735";
+
+// Tarifa
+const PRECO_MINIMO   = 10.00;  // R$ mínimo
+const FATOR_KM       = 1.60;   // fator por km acima de 5km
+const KM_BASE        = 5;      // km que cobrem o mínimo
+
+// ═══════════════════════════════════════════════════════
+// MAP INIT
+// ═══════════════════════════════════════════════════════
+const map = L.map('map', { zoomControl: false }).setView([-23.55, -46.63], 12);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO',
+  maxZoom: 19
+}).addTo(map);
+
+// markers & layer
+let markers = {};
+let routeLayer = null;
+
+function makeIcon(color, emoji) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:34px;height:34px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5)"><span style="transform:rotate(45deg);font-size:15px">${emoji}</span></div>`,
+    iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-34]
+  });
+}
+
+const ICONS = {
+  origin: makeIcon('#22c55e','🏠'),
+  dest:   makeIcon('#ef4444','🏁'),
+  stop0:  makeIcon('#eab308','1️⃣'),
+  stop1:  makeIcon('#eab308','2️⃣'),
+  stop2:  makeIcon('#eab308','3️⃣'),
+};
+
+function placeMarker(id, latlng, label) {
+  if (markers[id]) map.removeLayer(markers[id]);
+  markers[id] = L.marker(latlng, { icon: ICONS[id] || ICONS.dest })
+    .addTo(map)
+    .bindPopup(`<b style="font-family:Syne,sans-serif">${label}</b>`)
+    .openPopup();
+}
+
+function removeMarker(id) {
+  if (markers[id]) { map.removeLayer(markers[id]); delete markers[id]; }
+}
+
+// ═══════════════════════════════════════════════════════
+// STOPS STATE
+// ═══════════════════════════════════════════════════════
+let stops = []; // [{id, input, latlng, address}]
+let stopCount = 0;
+
+function addStop() {
+  if (stops.length >= 3) return;
+  const idx = stopCount++;
+  const id = `stop${idx}`;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'stop-wrapper';
+  wrapper.id = `wrapper-${id}`;
+  wrapper.innerHTML = `
+    <div class="input-group" style="margin-bottom:0">
+      <div class="input-label"><span class="dot-stop">●</span> Parada ${stops.length + 1}</div>
+      <input class="input-field" id="${id}" placeholder="Endereço da parada..." autocomplete="off"
+        oninput="onAddressInput(this, 'ac-${id}')">
+      <button class="input-action remove" title="Remover parada" onclick="removeStop('${id}','${wrapper.id}')">✕</button>
+      <div class="autocomplete-list" id="ac-${id}"></div>
+    </div>
+    <div class="route-line" style="margin-top:8px"><div class="route-line-dot"></div><div class="route-line-bar"></div></div>
+  `;
+  document.getElementById('stopsContainer').appendChild(wrapper);
+  stops.push({ id, latlng: null, address: '' });
+  updateStopCount();
+  recalcRoute();
+}
+
+function removeStop(id, wrapperId) {
+  stops = stops.filter(s => s.id !== id);
+  removeMarker(id);
+  document.getElementById(wrapperId)?.remove();
+  updateStopCount();
+  recalcRoute();
+}
+
+function updateStopCount() {
+  const btn = document.getElementById('addStopBtn');
+  document.getElementById('stopCountLabel').textContent = `(${stops.length}/3)`;
+  btn.disabled = stops.length >= 3;
+  // re-label stops
+  stops.forEach((s, i) => {
+    const lbl = document.querySelector(`#wrapper-${s.id} .input-label`);
+    if (lbl) lbl.innerHTML = `<span class="dot-stop">●</span> Parada ${i+1}`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// GEOCODING (Nominatim — gratuito, sem chave)
+// ═══════════════════════════════════════════════════════
+let acTimers = {};
+
+async function geocodeSearch(query) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&accept-language=pt-BR`;
+  const r = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
+  return await r.json();
+}
+
+function onAddressInput(input, acId) {
+  const val = input.value.trim();
+  clearTimeout(acTimers[acId]);
+  if (val.length < 3) { closeAC(acId); return; }
+  acTimers[acId] = setTimeout(async () => {
+    try {
+      const results = await geocodeSearch(val);
+      showAC(acId, results, input);
+    } catch(e) {}
+  }, 400);
+}
+
+function showAC(acId, results, input) {
+  const list = document.getElementById(acId);
+  list.innerHTML = '';
+  if (!results.length) { list.classList.remove('open'); return; }
+  results.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'ac-item';
+    const name = r.display_name.split(',').slice(0,3).join(',');
+    item.innerHTML = `${name}<small>${r.display_name}</small>`;
+    item.onclick = () => selectAddress(input, acId, r);
+    list.appendChild(item);
+  });
+  list.classList.add('open');
+}
+
+function closeAC(acId) {
+  const el = document.getElementById(acId);
+  if (el) el.classList.remove('open');
+}
+
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.autocomplete-list').forEach(l => {
+    if (!l.contains(e.target)) l.classList.remove('open');
+  });
+});
+
+function selectAddress(input, acId, result) {
+  input.value = result.display_name.split(',').slice(0,3).join(',');
+  closeAC(acId);
+  const latlng = [parseFloat(result.lat), parseFloat(result.lon)];
+
+  if (input.id === 'origin') {
+    placeMarker('origin', latlng, '🏠 Partida');
+    originCoords = latlng;
+  } else if (input.id === 'dest') {
+    placeMarker('dest', latlng, '🏁 Destino');
+    destCoords = latlng;
+  } else {
+    const stop = stops.find(s => s.id === input.id);
+    if (stop) {
+      stop.latlng = latlng;
+      stop.address = input.value;
+      placeMarker(stop.id, latlng, `📍 Parada`);
+    }
+  }
+  recalcRoute();
+}
+
+// ═══════════════════════════════════════════════════════
+// MY LOCATION
+// ═══════════════════════════════════════════════════════
+async function useMyLocation() {
+  if (!navigator.geolocation) { showToast('Geolocalização não suportada.', 'error'); return; }
+  showToast('📍 Obtendo sua localização...', '');
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+    originCoords = [lat, lon];
+    // reverse geocode
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=pt-BR`);
+      const d = await r.json();
+      document.getElementById('origin').value = d.display_name?.split(',').slice(0,3).join(',') || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    } catch(e) {
+      document.getElementById('origin').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    }
+    placeMarker('origin', originCoords, '🏠 Sua localização');
+    map.setView(originCoords, 15);
+    recalcRoute();
+    showToast('✅ Localização obtida!', 'success');
+  }, () => showToast('Não foi possível obter sua localização.', 'error'));
+}
+
+// ═══════════════════════════════════════════════════════
+// COORDS STATE
+// ═══════════════════════════════════════════════════════
+let originCoords = null;
+let destCoords   = null;
+
+// ═══════════════════════════════════════════════════════
+// ROUTING — OpenRouteService
+// ═══════════════════════════════════════════════════════
+let calcTimer = null;
+let lastRouteData = null;
+
+async function recalcRoute() {
+  clearTimeout(calcTimer);
+  calcTimer = setTimeout(doCalc, 600);
+}
+
+async function doCalc() {
+  if (!originCoords || !destCoords) {
+    hideRouteInfo(); return;
+  }
+
+  // build waypoints: origin → stops → dest
+  const waypoints = [originCoords, ...stops.filter(s=>s.latlng).map(s=>s.latlng), destCoords];
+  if (waypoints.length < 2) { hideRouteInfo(); return; }
+
+  showCalcState(true);
+
+  // If ORS key not set, use Nominatim straight-line fallback
+  if (ORS_KEY === 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc3ZDM4MTkzYWVmMDRjMTM4NTI5YjBiNTVjN2MwNjZkIiwiaCI6Im11cm11cjY0In0=') {
+    await fallbackCalc(waypoints);
+    return;
+  }
+
+  try {
+    const body = {
+      coordinates: waypoints.map(([lat,lon]) => [lon, lat]),
+      instructions: false,
+      units: 'km'
+    };
+    const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/json', {
+      method: 'POST',
+      headers: { 'Authorization': ORS_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const route = data.routes[0];
+    const distKm = route.summary.distance;
+    const durSec = route.summary.duration;
+
+    // decode geometry
+    const coords = decodePolyline(route.geometry);
+    drawRoute(coords);
+    fitBounds(waypoints);
+
+    const price = calcPrice(distKm);
+    showRouteInfo(distKm, durSec, price);
+    lastRouteData = { distKm, durSec, price, waypoints };
+
+  } catch(e) {
+    console.warn('ORS error, using fallback:', e);
+    await fallbackCalc(waypoints);
+  }
+}
+
+// Straight-line fallback (when no ORS key)
+async function fallbackCalc(waypoints) {
+  let totalKm = 0;
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    totalKm += haversine(waypoints[i], waypoints[i+1]);
+  }
+  // add 25% for roads
+  totalKm *= 1.25;
+  const durSec = (totalKm / 30) * 3600; // avg 30km/h moto
+
+  // draw straight lines
+  if (routeLayer) map.removeLayer(routeLayer);
+  routeLayer = L.polyline(waypoints, { color: '#f97316', weight: 3, opacity: 0.7, dashArray: '8 6' }).addTo(map);
+  fitBounds(waypoints);
+
+  const price = calcPrice(totalKm);
+  showRouteInfo(totalKm, durSec, price, true);
+  lastRouteData = { distKm: totalKm, durSec, price, waypoints };
+}
+
+function haversine([lat1,lon1], [lat2,lon2]) {
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function decodePolyline(encoded) {
+  let index = 0, lat = 0, lng = 0;
+  const coords = [];
+  while (index < encoded.length) {
+    let b, shift = 0, result = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : result >> 1;
+    shift = result = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : result >> 1;
+    coords.push([lat/1e5, lng/1e5]);
+  }
+  return coords;
+}
+
+function drawRoute(coords) {
+  if (routeLayer) map.removeLayer(routeLayer);
+  // Glow effect: draw two layers
+  L.polyline(coords, { color: '#f97316', weight: 8, opacity: 0.15 }).addTo(map);
+  routeLayer = L.polyline(coords, { color: '#f97316', weight: 3, opacity: 0.9 }).addTo(map);
+}
+
+function fitBounds(waypoints) {
+  map.fitBounds(waypoints, { padding: [40, 40] });
+}
+
+// ═══════════════════════════════════════════════════════
+// PRICE CALC
+// ═══════════════════════════════════════════════════════
+function calcPrice(distKm) {
+  if (distKm <= KM_BASE) return PRECO_MINIMO;
+  const extra = distKm - KM_BASE;
+  return PRECO_MINIMO + (extra * FATOR_KM);
+}
+
+function getPriceBreakdown(distKm, price) {
+  if (distKm <= KM_BASE) return `Valor mínimo (até ${KM_BASE}km)`;
+  const extra = (distKm - KM_BASE).toFixed(1);
+  return `R$${PRECO_MINIMO.toFixed(2)} base + ${extra}km × R$${FATOR_KM.toFixed(2)}/km`;
+}
+
+// ═══════════════════════════════════════════════════════
+// UI UPDATES
+// ═══════════════════════════════════════════════════════
+function showCalcState(show) {
+  document.getElementById('calcState').style.display = show ? 'flex' : 'none';
+  if (show) document.getElementById('routeInfo').style.display = 'none';
+}
+
+function hideRouteInfo() {
+  showCalcState(false);
+  document.getElementById('routeInfo').style.display = 'none';
+  if (routeLayer) map.removeLayer(routeLayer);
+  lastRouteData = null;
+}
+
+function showRouteInfo(distKm, durSec, price, approx = false) {
+  showCalcState(false);
+  document.getElementById('routeInfo').style.display = 'block';
+
+  const mins = Math.round(durSec / 60);
+  const hrs = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  const durStr = hrs > 0 ? `${hrs}h ${remMins}min` : `${mins} min`;
+
+  document.getElementById('infoDistance').textContent = `${distKm.toFixed(1)} km${approx?' (aprox.)':''}`;
+  document.getElementById('infoDuration').textContent = durStr;
+  document.getElementById('infoStops').textContent = stops.filter(s=>s.latlng).length || 'Nenhuma';
+  document.getElementById('infoPrice').textContent = `R$ ${price.toFixed(2)}`;
+  document.getElementById('priceBreakdown').textContent = getPriceBreakdown(distKm, price);
+}
+
+// ═══════════════════════════════════════════════════════
+// PHONE MASK
+// ═══════════════════════════════════════════════════════
+function phoneMask(input) {
+  let v = input.value.replace(/\D/g, '').slice(0,11);
+  if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d*)$/, '($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d*)$/, '($1) $2');
+  input.value = v;
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════
+async function submitRequest() {
+  const name  = document.getElementById('clientName').value.trim();
+  const phone = document.getElementById('clientPhone').value.trim();
+  const note  = document.getElementById('clientNote').value.trim();
+
+  if (!name)         { showToast('⚠️ Informe seu nome.', 'error'); return; }
+  if (!phone)        { showToast('⚠️ Informe seu telefone.', 'error'); return; }
+  if (!originCoords) { showToast('⚠️ Defina o ponto de partida.', 'error'); return; }
+  if (!destCoords)   { showToast('⚠️ Defina o destino.', 'error'); return; }
+  if (!lastRouteData){ showToast('⚠️ Aguarde o cálculo da rota.', 'error'); return; }
+
+  const { distKm, durSec, price } = lastRouteData;
+  const mins = Math.round(durSec/60);
+  const origin = document.getElementById('origin').value;
+  const dest   = document.getElementById('dest').value;
+  const stopsText = stops.filter(s=>s.latlng).map((s,i)=>`Parada ${i+1}: ${document.getElementById(s.id)?.value||s.address}`).join('\n');
+
+  // Build WhatsApp message
+  const msg = [
+    `🏍️ *NOVA SOLICITAÇÃO DE CORRIDA — MotoRun*`,
+    ``,
+    `👤 *Cliente:* ${name}`,
+    `📞 *Telefone:* ${phone}`,
+    ``,
+    `📍 *Partida:* ${origin}`,
+    stopsText ? stopsText : null,
+    `🏁 *Destino:* ${dest}`,
+    ``,
+    `🛣️ *Distância:* ${distKm.toFixed(1)} km`,
+    `⏱️ *Tempo estimado:* ${mins} min`,
+    `💰 *Valor:* R$ ${price.toFixed(2)}`,
+    note ? `📝 *Obs:* ${note}` : null,
+  ].filter(Boolean).join('\n');
+
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+
+  // Show success modal
+  document.getElementById('successDetail').innerHTML = `
+    <div class="sd-row"><span class="k">Cliente</span><span class="v">${name}</span></div>
+    <div class="sd-row"><span class="k">Distância</span><span class="v">${distKm.toFixed(1)} km</span></div>
+    <div class="sd-row"><span class="k">Tempo estimado</span><span class="v">${mins} min</span></div>
+    <div class="sd-row"><span class="k">Valor</span><span class="v or">R$ ${price.toFixed(2)}</span></div>
+  `;
+  document.getElementById('successOverlay').classList.add('show');
+
+  // Open WhatsApp after short delay
+  setTimeout(() => window.open(waUrl, '_blank'), 600);
+}
+
+// ═══════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════
+function resetAll() {
+  document.getElementById('successOverlay').classList.remove('show');
+  document.getElementById('origin').value = '';
+  document.getElementById('dest').value = '';
+  document.getElementById('clientName').value = '';
+  document.getElementById('clientPhone').value = '';
+  document.getElementById('clientNote').value = '';
+  document.getElementById('stopsContainer').innerHTML = '';
+  stops = []; stopCount = 0;
+  updateStopCount();
+  originCoords = null; destCoords = null;
+  Object.keys(markers).forEach(k => { map.removeLayer(markers[k]); });
+  markers = {};
+  if (routeLayer) map.removeLayer(routeLayer);
+  routeLayer = null;
+  lastRouteData = null;
+  hideRouteInfo();
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTIFY IF NO ORS KEY
+// ═══════════════════════════════════════════════════════
+if (ORS_KEY === 'SUA_CHAVE_ORS_AQUI') {
+  setTimeout(() => showToast('⚠️ Configure sua chave ORS para rotas precisas!', 'error'), 1500);
+}
+</script>
+</body>
+</html>
