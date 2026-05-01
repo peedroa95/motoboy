@@ -11,7 +11,7 @@
 // ═══════════════════════════════════════════════════════
 // ADMIN — senha, storage e dashboard
 // ═══════════════════════════════════════════════════════
-const ADMIN_PASSWORD = '1234'; // ← altere sua senha aqui
+const ADMIN_PASSWORD = 'motorun2024'; // ← altere sua senha aqui
 const STORAGE_KEY    = 'motorun_rides';
 let currentFilter    = 'week';
 let adminLoggedIn    = false;
@@ -153,6 +153,7 @@ function renderDashboard() {
         <div style="font-size:11px">${hr}</div>
       </td>
       <td style="white-space:nowrap">${(r.km||0).toFixed(1)} km</td>
+      <td style="white-space:nowrap">${r.payment ? ({'Pix':'⚡','Dinheiro':'💵','Cartão':'💳'}[r.payment]||'') + ' ' + r.payment : '-'}</td>
       <td style="white-space:nowrap">
         <span style="color:var(--accent);font-family:Syne,sans-serif;font-weight:700">R$ ${(r.preco||0).toFixed(2)}</span>
       </td>
@@ -669,6 +670,34 @@ textarea.input-field { resize: none; height: 70px; padding: 10px 14px; line-heig
   .dashboard { width: 100vw; max-height: 100vh; border-radius: 0; }
   .rides-table th:nth-child(3), .rides-table td:nth-child(3) { display: none; }
 }
+
+/* PAYMENT METHOD */
+.payment-group { margin-bottom: 16px; }
+.payment-label { font-size: 11px; font-weight: 500; color: var(--text-2); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; }
+.payment-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pay-opt { position: relative; }
+.pay-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.pay-opt label {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 12px 8px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface2);
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.pay-opt label .pay-icon { font-size: 22px; line-height: 1; }
+.pay-opt label .pay-name { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: var(--text-2); font-family: 'Syne', sans-serif; text-transform: uppercase; }
+.pay-opt input:checked + label {
+  border-color: var(--accent);
+  background: rgba(249,115,22,0.08);
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+}
+.pay-opt input:checked + label .pay-name { color: var(--accent); }
+.pay-opt label:hover { border-color: var(--text-3); }
+.pay-pix input:checked + label { border-color: #22c55e; background: rgba(34,197,94,0.08); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+.pay-pix input:checked + label .pay-name { color: #22c55e; }
+.pay-cash input:checked + label { border-color: #eab308; background: rgba(234,179,8,0.08); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); }
+.pay-cash input:checked + label .pay-name { color: #eab308; }
+.pay-card input:checked + label { border-color: #60a5fa; background: rgba(96,165,250,0.08); box-shadow: 0 0 0 3px rgba(96,165,250,0.1); }
+.pay-card input:checked + label .pay-name { color: #60a5fa; }
 </style>
 </head>
 <body>
@@ -762,6 +791,34 @@ textarea.input-field { resize: none; height: 70px; padding: 10px 14px; line-heig
         <div class="input-group">
           <div class="input-label">Observações (opcional)</div>
           <textarea class="input-field" id="clientNote" placeholder="Ex: Precisa de nota fiscal, entrega no portão, frágil..."></textarea>
+        </div>
+      </div>
+
+      <!-- PAYMENT METHOD -->
+      <div class="payment-group">
+        <div class="payment-label">💳 Forma de Pagamento</div>
+        <div class="payment-options">
+          <div class="pay-opt pay-pix">
+            <input type="radio" name="payment" id="pay-pix" value="Pix" checked>
+            <label for="pay-pix">
+              <span class="pay-icon">⚡</span>
+              <span class="pay-name">Pix</span>
+            </label>
+          </div>
+          <div class="pay-opt pay-cash">
+            <input type="radio" name="payment" id="pay-cash" value="Dinheiro">
+            <label for="pay-cash">
+              <span class="pay-icon">💵</span>
+              <span class="pay-name">Dinheiro</span>
+            </label>
+          </div>
+          <div class="pay-opt pay-card">
+            <input type="radio" name="payment" id="pay-card" value="Cartão">
+            <label for="pay-card">
+              <span class="pay-icon">💳</span>
+              <span class="pay-name">Cartão</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -1262,9 +1319,10 @@ function phoneMask(input) {
 // SUBMIT
 // ═══════════════════════════════════════════════════════
 async function submitRequest() {
-  const name  = document.getElementById('clientName').value.trim();
-  const phone = document.getElementById('clientPhone').value.trim();
-  const note  = document.getElementById('clientNote').value.trim();
+  const name    = document.getElementById('clientName').value.trim();
+  const phone   = document.getElementById('clientPhone').value.trim();
+  const note    = document.getElementById('clientNote').value.trim();
+  const payment = document.querySelector('input[name="payment"]:checked')?.value || 'Pix';
 
   if (!name)          { showToast('⚠️ Informe seu nome.', 'error'); return; }
   if (!phone)         { showToast('⚠️ Informe seu telefone.', 'error'); return; }
@@ -1291,16 +1349,19 @@ async function submitRequest() {
     `🛣️ *Distância:* ${distKm.toFixed(1)} km`,
     `⏱️ *Tempo estimado:* ${mins} min`,
     `💰 *Valor:* R$ ${price.toFixed(2)}`,
+    `💳 *Pagamento:* ${payment}`,
     note ? `📝 *Obs:* ${note}` : null,
   ].filter(Boolean).join('\n');
 
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
+  const payIcons = { 'Pix': '⚡', 'Dinheiro': '💵', 'Cartão': '💳' };
   document.getElementById('successDetail').innerHTML = `
     <div class="sd-row"><span class="k">Cliente</span><span class="v">${name}</span></div>
     <div class="sd-row"><span class="k">Distância</span><span class="v">${distKm.toFixed(1)} km</span></div>
     <div class="sd-row"><span class="k">Tempo estimado</span><span class="v">${mins} min</span></div>
     <div class="sd-row"><span class="k">Valor</span><span class="v or">R$ ${price.toFixed(2)}</span></div>
+    <div class="sd-row"><span class="k">Pagamento</span><span class="v">${payIcons[payment] || ''} ${payment}</span></div>
   `;
   document.getElementById('successOverlay').classList.add('show');
   // Salva corrida no painel admin
@@ -1308,7 +1369,7 @@ async function submitRequest() {
   saveRide({
     name: name, phone, origin, dest,
     stops: stopCount || null,
-    distKm, price, durMin: mins, note
+    distKm, price, durMin: mins, note, payment
   });
 
   setTimeout(() => window.open(waUrl, '_blank'), 600);
@@ -1320,6 +1381,7 @@ async function submitRequest() {
 function resetAll() {
   document.getElementById('successOverlay').classList.remove('show');
   ['origin','dest','clientName','clientPhone','clientNote'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pay-pix').checked = true;
   document.getElementById('stopsContainer').innerHTML = '';
   stops = []; stopCount = 0;
   updateStopCount();
@@ -1491,6 +1553,7 @@ function renderDashboard() {
         <div style="font-size:11px">${hr}</div>
       </td>
       <td style="white-space:nowrap">${(r.km||0).toFixed(1)} km</td>
+      <td style="white-space:nowrap">${r.payment ? ({'Pix':'⚡','Dinheiro':'💵','Cartão':'💳'}[r.payment]||'') + ' ' + r.payment : '-'}</td>
       <td style="white-space:nowrap">
         <span style="color:var(--accent);font-family:Syne,sans-serif;font-weight:700">R$ ${(r.preco||0).toFixed(2)}</span>
       </td>
@@ -1582,6 +1645,7 @@ function clearAllRides() {
             <th>Rota</th>
             <th>Data / Hora</th>
             <th>Distância</th>
+            <th>Pagamento</th>
             <th>Valor</th>
             <th></th>
           </tr>
