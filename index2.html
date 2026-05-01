@@ -179,7 +179,6 @@ function clearAllRides() {
 }
 
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmZRm6Erc2M1bJsuRpOZrlEc9rNyNAs5I&libraries=places&language=pt-BR&region=BR"></script>
 <style>
 :root {
   --bg: #0d0d0d;
@@ -954,24 +953,25 @@ let acTimers = {};
 // ═══════════════════════════════════════════════════════
 
 // Bounding box de Fortaleza para bias do Google Places
-const FORTALEZA_BOUNDS = new google.maps.LatLngBounds(
-  new google.maps.LatLng(-3.8392, -38.6272), // SW
-  new google.maps.LatLng(-3.6942, -38.3860)  // NE
-);
-
-// Serviços Google
-let placesService = null;
+// Serviços Google — inicializados pelo callback
+let placesService       = null;
 let autocompleteService = null;
+let FORTALEZA_BOUNDS    = null;
+let sessionToken        = null;
 
 function initGoogleServices() {
+  FORTALEZA_BOUNDS = new google.maps.LatLngBounds(
+    new google.maps.LatLng(-3.8392, -38.6272), // SW
+    new google.maps.LatLng(-3.6942, -38.3860)  // NE
+  );
   autocompleteService = new google.maps.places.AutocompleteService();
-  // PlacesService precisa de um elemento DOM ou mapa
+  sessionToken        = new google.maps.places.AutocompleteSessionToken();
   const dummy = document.createElement('div');
   placesService = new google.maps.places.PlacesService(dummy);
+  console.log('✅ Google Maps Places pronto!');
 }
 
-// Inicializa quando a página carregar
-window.addEventListener('load', initGoogleServices);
+// initGoogleServices é chamado automaticamente pelo callback do Google Maps
 
 function onAddressInput(input, acId) {
   const val = input.value.trim();
@@ -981,24 +981,30 @@ function onAddressInput(input, acId) {
 }
 
 function searchPlaces(query, acId, input) {
-  if (!autocompleteService) return;
+  if (!autocompleteService || !FORTALEZA_BOUNDS) {
+    showACEmpty(acId, 'Aguarde, carregando serviço de mapas...');
+    return;
+  }
 
   autocompleteService.getPlacePredictions({
-    input: query,
-    bounds: FORTALEZA_BOUNDS,
-    strictBounds: true,          // <- só retorna dentro do bbox de Fortaleza
+    input:                 query,
+    sessionToken:          sessionToken,
+    bounds:                FORTALEZA_BOUNDS,
+    strictBounds:          true,
     componentRestrictions: { country: 'br' },
-    types: ['geocode', 'establishment'],
-    language: 'pt-BR',
+    types:                 ['geocode', 'establishment'],
+    language:              'pt-BR',
   }, (predictions, status) => {
-    if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+    if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions || !predictions.length) {
       showACEmpty(acId, 'Nenhum endereço encontrado em Fortaleza');
       return;
     }
 
-    // Filtro extra: garante que o texto menciona Fortaleza
+    // Filtro extra: só mostra se menciona Fortaleza ou Ceará
     const filtered = predictions.filter(p =>
-      p.description.toLowerCase().includes('fortaleza')
+      p.description.toLowerCase().includes('fortaleza') ||
+      p.description.toLowerCase().includes('ceará') ||
+      p.description.toLowerCase().includes('ceara')
     );
 
     if (!filtered.length) {
@@ -1042,8 +1048,10 @@ function showACPredictions(acId, predictions, input) {
 function selectPrediction(input, acId, prediction) {
   // Busca detalhes do lugar para obter coordenadas
   placesService.getDetails(
-    { placeId: prediction.place_id, fields: ['geometry', 'formatted_address', 'name', 'address_components'] },
+    { placeId: prediction.place_id, fields: ['geometry', 'formatted_address', 'name', 'address_components'], sessionToken: sessionToken },
     (place, status) => {
+      // Renova token após cada seleção (boas práticas Google)
+      sessionToken = new google.maps.places.AutocompleteSessionToken();
       if (status !== google.maps.places.PlacesServiceStatus.OK || !place) return;
 
       // Verifica se está dentro de Fortaleza via componentes de endereço
@@ -1693,5 +1701,6 @@ function clearAllRides() {
 
 </div>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmZRm6Erc2M1bJsuRpOZrlEc9rNyNAs5I&libraries=places&language=pt-BR&region=BR&callback=initGoogleServices" async></script>
 </body>
 </html>
