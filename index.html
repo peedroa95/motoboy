@@ -609,26 +609,42 @@ function updateStopCount() {
 // ═══════════════════════════════════════════════════════
 let acTimers = {};
 
+// Limites geográficos estritos de Fortaleza-CE
+const FORTALEZA_LAT_MIN = -3.8392;
+const FORTALEZA_LAT_MAX = -3.6942;
+const FORTALEZA_LON_MIN = -38.6272;
+const FORTALEZA_LON_MAX = -38.3860;
+
+function dentroDeFortaleza(lat, lon) {
+  return (
+    lat >= FORTALEZA_LAT_MIN && lat <= FORTALEZA_LAT_MAX &&
+    lon >= FORTALEZA_LON_MIN && lon <= FORTALEZA_LON_MAX
+  );
+}
+
 async function geocodeSearch(query) {
-  // Busca restrita ao bounding box de Fortaleza + countrycodes=br
+  // Força "Fortaleza, Ceará" na query + bounded=1 no bbox
   const url = `https://nominatim.openstreetmap.org/search?format=json`
-    + `&q=${encodeURIComponent(query + ', Fortaleza, Ceara')}`
-    + `&limit=6&addressdetails=1&accept-language=pt-BR`
+    + `&q=${encodeURIComponent(query + ', Fortaleza, Ceará, Brasil')}`
+    + `&limit=10&addressdetails=1&accept-language=pt-BR`
     + `&viewbox=${FORTALEZA_BBOX}&bounded=1&countrycodes=br`;
 
   const r = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
   const results = await r.json();
 
-  // Filtro extra: garante que só retorna resultados dentro de Fortaleza
+  // Filtro triplo: coordenadas + cidade + nome
   return results.filter(item => {
+    const lat  = parseFloat(item.lat);
+    const lon  = parseFloat(item.lon);
     const addr = item.address || {};
-    const dn   = item.display_name || '';
-    return (
-      addr.city === 'Fortaleza' ||
-      addr.town === 'Fortaleza' ||
-      addr.municipality === 'Fortaleza' ||
-      dn.includes('Fortaleza')
-    );
+    const dn   = (item.display_name || '').toLowerCase();
+
+    const coordsOk = dentroDeFortaleza(lat, lon);
+    const cityOk   = addr.city === 'Fortaleza' || addr.town === 'Fortaleza' || addr.municipality === 'Fortaleza';
+    const nameOk   = dn.includes('fortaleza');
+
+    // Coordenadas dentro do bbox E pelo menos um campo de texto confirma Fortaleza
+    return coordsOk && (cityOk || nameOk);
   });
 }
 
