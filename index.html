@@ -1064,7 +1064,18 @@ async function recalcRoute() {
 async function doCalc() {
   if (!originCoords || !destCoords) { hideRouteInfo(); return; }
 
-  const waypoints = [originCoords, ...stops.filter(s=>s.latlng).map(s=>s.latlng), destCoords];
+  const activeStops = stops.filter(s => s.latlng);
+
+  // ── Otimiza a ordem das paradas (nearest neighbor) ──
+  let orderedStops = activeStops;
+  if (activeStops.length > 1) {
+    orderedStops = optimizeStops(originCoords, destCoords, activeStops);
+    // Atualiza visual se a ordem mudou
+    const changed = orderedStops.some((s, i) => s.id !== activeStops[i].id);
+    if (changed) applyOptimizedOrder(orderedStops);
+  }
+
+  const waypoints = [originCoords, ...orderedStops.map(s => s.latlng), destCoords];
   showCalcState(true);
 
   if (ORS_KEY === 'SUA_CHAVE_ORS_AQUI') {
@@ -1097,6 +1108,55 @@ async function doCalc() {
   } catch(e) {
     await fallbackCalc(waypoints);
   }
+}
+
+// ── Otimizacao de paradas: nearest neighbor greedy ──────────────────────────
+// Mantém origem e destino fixos, reordena apenas as paradas intermediárias.
+// Para até 3 paradas, testa todas as permutações (máx 6) e escolhe a menor.
+function optimizeStops(origin, dest, stopsArr) {
+  if (stopsArr.length <= 1) return stopsArr;
+
+  const perms = permutations(stopsArr);
+  let bestPerm = stopsArr;
+  let bestDist = Infinity;
+
+  perms.forEach(perm => {
+    const pts = [origin, ...perm.map(s => s.latlng), dest];
+    let d = 0;
+    for (let i = 0; i < pts.length - 1; i++) d += haversine(pts[i], pts[i+1]);
+    if (d < bestDist) { bestDist = d; bestPerm = perm; }
+  });
+
+  return bestPerm;
+}
+
+function permutations(arr) {
+  if (arr.length <= 1) return [arr];
+  const result = [];
+  arr.forEach((item, i) => {
+    const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+    permutations(rest).forEach(p => result.push([item, ...p]));
+  });
+  return result;
+}
+
+// Atualiza a ordem visual dos campos de parada no sidebar
+function applyOptimizedOrder(orderedStops) {
+  const container = document.getElementById('stopsContainer');
+  // Reordena os wrappers no DOM
+  orderedStops.forEach(s => {
+    const wrapper = document.getElementById('wrapper-' + s.id);
+    if (wrapper) container.appendChild(wrapper); // move para o final na nova ordem
+  });
+  // Atualiza o array global de stops
+  stops = [
+    ...orderedStops,
+    ...stops.filter(s => !s.latlng) // mantém paradas sem coordenada no final
+  ];
+  // Relabela os números
+  updateStopCount();
+  // Toast informando
+  showToast('✨ Paradas reordenadas para rota mais eficiente!', 'success');
 }
 
 async function fallbackCalc(waypoints) {
