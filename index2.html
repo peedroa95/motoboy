@@ -5,249 +5,210 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MotoRun — Solicite sua Corrida</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-/* ── RESET & VARS ── */
 :root {
-  --bg:       #0d0d0d;
-  --surface:  #141414;
-  --surface2: #1c1c1c;
-  --border:   #2a2a2a;
-  --accent:   #f97316;
-  --accent2:  #fb923c;
-  --green:    #22c55e;
-  --red:      #ef4444;
-  --yellow:   #eab308;
-  --blue:     #60a5fa;
-  --text:     #f5f5f5;
-  --text2:    #a3a3a3;
-  --text3:    #525252;
-  --r:        14px;
-  --rs:       8px;
+  --bg:#0d0d0d; --surface:#141414; --surface2:#1c1c1c; --border:#2a2a2a;
+  --accent:#f97316; --accent2:#fb923c; --green:#22c55e; --red:#ef4444;
+  --yellow:#eab308; --blue:#60a5fa; --text:#f5f5f5; --text2:#a3a3a3; --text3:#525252;
+  --r:14px; --rs:8px;
 }
-*  { margin:0; padding:0; box-sizing:border-box; }
-html, body { height:100%; overflow:hidden; }
-body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; display:flex; flex-direction:column; }
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;}
 
-/* ── TOPBAR ── */
-.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:56px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; z-index:200; }
-.logo   { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; display:flex; align-items:center; gap:8px; }
-.logo-icon { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
-.logo span { color:var(--accent); }
-.topbar-right { display:flex; align-items:center; gap:12px; }
-.status-badge { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
-.status-dot   { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px rgba(34,197,94,.5); animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(.85)} }
-.admin-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text2); font-family:'DM Sans',sans-serif; font-size:12px; padding:6px 12px; border-radius:6px; cursor:pointer; transition:all .2s; }
-.admin-btn:hover { border-color:var(--accent); color:var(--accent); }
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:200;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px;}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo span{color:var(--accent);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.status-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.5);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.admin-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .2s;}
+.admin-btn:hover{border-color:var(--accent);color:var(--accent);}
 
-/* ── LAYOUT ── */
-.main    { display:flex; flex:1; overflow:hidden; }
-.sidebar { width:380px; min-width:380px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; z-index:100; }
-.sidebar-body { flex:1; overflow-y:auto; padding:20px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
-#map { flex:1; }
+/* LAYOUT */
+.main{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:400px;min-width:400px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100;}
+.sidebar-body{flex:1;overflow-y:auto;padding:20px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+#map{flex:1;}
 
-/* ── TYPOGRAPHY ── */
-.section-title { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+/* SECTION */
+.section-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/* ── INPUTS ── */
-.field   { margin-bottom:10px; position:relative; }
-.f-label { font-size:11px; font-weight:500; color:var(--text2); margin-bottom:5px; display:flex; align-items:center; gap:6px; }
-.dot-a { color:var(--green); } .dot-b { color:var(--red); } .dot-s { color:var(--yellow); }
+/* INPUTS */
+.field{margin-bottom:10px;position:relative;}
+.f-label{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.dot-a{color:var(--green);}.dot-b{color:var(--red);}.dot-s{color:var(--yellow);}
+.f-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 42px 11px 14px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.f-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.f-input::placeholder{color:var(--text3);}
+textarea.f-input{resize:none;height:70px;padding:10px 14px;}
+.f-btn{position:absolute;right:10px;bottom:10px;width:26px;height:26px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.f-btn:hover{background:var(--accent2);transform:scale(1.05);}
+.f-btn.rm{background:#2a1515;color:var(--red);}
+.f-btn.rm:hover{background:var(--red);color:#fff;}
 
-.f-input {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:var(--rs); color:var(--text); font-family:'DM Sans',sans-serif;
-  font-size:14px; padding:11px 42px 11px 14px; outline:none;
-  transition:border-color .2s, box-shadow .2s;
-}
-.f-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(249,115,22,.12); }
-.f-input::placeholder { color:var(--text3); }
+/* AUTOCOMPLETE */
+.ac-list{position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);z-index:9999;max-height:220px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);}
+.ac-list.open{display:block;}
+.ac-item{padding:10px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);line-height:1.4;transition:background .15s;}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover{background:rgba(249,115,22,.1);color:var(--accent);}
+.ac-item small{color:var(--text3);font-size:11px;display:block;margin-top:2px;}
+.ac-empty{color:var(--text3);font-size:12px;cursor:default;}
+.ac-empty:hover{background:transparent;color:var(--text3);}
 
-textarea.f-input { resize:none; height:70px; padding:10px 14px; }
+/* CONNECTOR */
+.connector{display:flex;align-items:center;gap:10px;margin:-4px 0 6px 6px;}
+.c-dot{width:6px;height:6px;border-radius:50%;border:1px solid var(--border);}
+.c-bar{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
 
-.f-btn {
-  position:absolute; right:10px; bottom:10px;
-  width:26px; height:26px; background:var(--accent); border:none;
-  border-radius:6px; color:#fff; font-size:14px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; transition:all .2s;
-}
-.f-btn:hover { background:var(--accent2); transform:scale(1.05); }
-.f-btn.rm { background:#2a1515; color:var(--red); }
-.f-btn.rm:hover { background:var(--red); color:#fff; }
+/* STOP BTN */
+.add-stop-btn{width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:var(--rs);color:var(--text3);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-bottom:16px;}
+.add-stop-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,.05);}
+.add-stop-btn:disabled{opacity:.3;cursor:not-allowed;}
 
-/* ── AUTOCOMPLETE ── */
-.ac-list {
-  position:absolute; top:100%; left:0; right:0;
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:var(--rs); z-index:9999; max-height:220px;
-  overflow-y:auto; display:none;
-  box-shadow:0 8px 24px rgba(0,0,0,.6);
-}
-.ac-list.open { display:block; }
-.ac-item { padding:10px 14px; font-size:13px; cursor:pointer; border-bottom:1px solid var(--border); line-height:1.4; transition:background .15s; }
-.ac-item:last-child { border-bottom:none; }
-.ac-item:hover { background:rgba(249,115,22,.1); color:var(--accent); }
-.ac-item small { color:var(--text3); font-size:11px; display:block; margin-top:2px; }
-.ac-empty { color:var(--text3); font-size:12px; cursor:default; }
-.ac-empty:hover { background:transparent; color:var(--text3); }
+/* INFO CARD */
+.info-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;}
+.info-row:not(:last-child){border-bottom:1px solid var(--border);}
+.info-row .k{color:var(--text2);font-size:13px;}
+.info-row .v{font-weight:600;}
+.info-row .v.price{color:var(--accent);font-size:22px;font-family:'Syne',sans-serif;}
+.info-row .v.gr{color:var(--green);}
+.price-note{font-size:11px;color:var(--text3);margin-top:4px;text-align:right;}
 
-/* ── ROUTE CONNECTOR ── */
-.connector { display:flex; align-items:center; gap:10px; margin:-4px 0 6px 6px; }
-.c-dot { width:6px; height:6px; border-radius:50%; border:1px solid var(--border); }
-.c-bar { flex:1; height:1px; background:linear-gradient(to right,var(--border),transparent); }
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 
-/* ── ADD STOP ── */
-.add-stop-btn {
-  width:100%; padding:9px; background:transparent; border:1px dashed var(--border);
-  border-radius:var(--rs); color:var(--text3); font-family:'DM Sans',sans-serif;
-  font-size:13px; cursor:pointer; display:flex; align-items:center;
-  justify-content:center; gap:6px; transition:all .2s; margin-bottom:16px;
-}
-.add-stop-btn:hover  { border-color:var(--accent); color:var(--accent); background:rgba(249,115,22,.05); }
-.add-stop-btn:disabled { opacity:.3; cursor:not-allowed; }
+/* PAYMENT */
+.pay-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.pay-opt{position:relative;}
+.pay-opt input[type="radio"]{position:absolute;opacity:0;width:0;height:0;}
+.pay-opt label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border:1px solid var(--border);border-radius:var(--rs);background:var(--surface2);cursor:pointer;transition:all .2s;text-align:center;}
+.pay-opt label .pi{font-size:22px;line-height:1;}
+.pay-opt label .pn{font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--text2);font-family:'Syne',sans-serif;text-transform:uppercase;}
+.pay-opt.pix  input:checked+label{border-color:var(--green);background:rgba(34,197,94,.08);box-shadow:0 0 0 3px rgba(34,197,94,.1);}
+.pay-opt.pix  input:checked+label .pn{color:var(--green);}
+.pay-opt.cash input:checked+label{border-color:var(--yellow);background:rgba(234,179,8,.08);box-shadow:0 0 0 3px rgba(234,179,8,.1);}
+.pay-opt.cash input:checked+label .pn{color:var(--yellow);}
+.pay-opt.card input:checked+label{border-color:var(--blue);background:rgba(96,165,250,.08);box-shadow:0 0 0 3px rgba(96,165,250,.1);}
+.pay-opt.card input:checked+label .pn{color:var(--blue);}
+.pay-opt label:hover{border-color:var(--text3);}
 
-/* ── INFO CARD ── */
-.info-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:16px; margin-bottom:16px; }
-.info-row  { display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:14px; }
-.info-row:not(:last-child) { border-bottom:1px solid var(--border); }
-.info-row .k { color:var(--text2); font-size:13px; }
-.info-row .v { font-weight:600; }
-.info-row .v.price  { color:var(--accent); font-size:20px; font-family:'Syne',sans-serif; }
-.info-row .v.green  { color:var(--green); }
-.price-note { font-size:11px; color:var(--text3); margin-top:4px; text-align:right; }
+/* PIX ONLINE BADGE */
+.pix-online-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);border-radius:100px;padding:2px 7px;margin-left:6px;font-weight:600;}
 
-/* ── TWO COL ── */
-.two-col { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+/* SUBMIT */
+.submit-btn{width:100%;padding:15px;background:var(--accent);border:none;border-radius:var(--r);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;margin-bottom:8px;position:relative;overflow:hidden;}
+.submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);}
+.submit-btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(249,115,22,.35);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
 
-/* ── PAYMENT ── */
-.pay-opts { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
-.pay-opt  { position:relative; }
-.pay-opt input[type="radio"] { position:absolute; opacity:0; width:0; height:0; }
-.pay-opt label {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:6px; padding:12px 8px; border:1px solid var(--border); border-radius:var(--rs);
-  background:var(--surface2); cursor:pointer; transition:all .2s; text-align:center;
-}
-.pay-opt label .pi { font-size:22px; line-height:1; }
-.pay-opt label .pn { font-size:11px; font-weight:600; letter-spacing:.5px; color:var(--text2); font-family:'Syne',sans-serif; text-transform:uppercase; }
-.pay-opt.pix  input:checked + label { border-color:var(--green); background:rgba(34,197,94,.08);  box-shadow:0 0 0 3px rgba(34,197,94,.1);  }
-.pay-opt.pix  input:checked + label .pn { color:var(--green); }
-.pay-opt.cash input:checked + label { border-color:var(--yellow); background:rgba(234,179,8,.08);  box-shadow:0 0 0 3px rgba(234,179,8,.1);  }
-.pay-opt.cash input:checked + label .pn { color:var(--yellow); }
-.pay-opt.card input:checked + label { border-color:var(--blue);   background:rgba(96,165,250,.08); box-shadow:0 0 0 3px rgba(96,165,250,.1); }
-.pay-opt.card input:checked + label .pn { color:var(--blue); }
-.pay-opt label:hover { border-color:var(--text3); }
+/* CALC */
+.calc-box{display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;padding:12px;background:var(--surface2);border-radius:var(--rs);margin-bottom:16px;}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── SUBMIT ── */
-.submit-btn {
-  width:100%; padding:15px; background:var(--accent); border:none; border-radius:var(--r);
-  color:#fff; font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
-  transition:all .2s; margin-bottom:8px; position:relative; overflow:hidden;
-}
-.submit-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.1),transparent); }
-.submit-btn:hover { background:var(--accent2); transform:translateY(-1px); box-shadow:0 8px 24px rgba(249,115,22,.35); }
-.submit-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:12px 20px;font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:rgba(34,197,94,.4);}
+.toast.err{border-color:rgba(239,68,68,.4);}
 
-/* ── CALCULATING ── */
-.calc-box { display:flex; align-items:center; gap:10px; color:var(--text2); font-size:13px; padding:12px; background:var(--surface2); border-radius:var(--rs); margin-bottom:16px; }
-.spinner  { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
-@keyframes spin { to { transform:rotate(360deg); } }
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:460px;width:90%;text-align:center;animation:popIn .35s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.modal-icon{width:72px;height:72px;background:rgba(34,197,94,.1);border:2px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;}
+.modal h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;}
+.modal p{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:20px;}
+.detail{background:var(--surface2);border-radius:var(--rs);padding:14px 16px;text-align:left;margin-bottom:20px;}
+.d-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;}
+.d-row:not(:last-child){border-bottom:1px solid var(--border);}
+.d-row .k{color:var(--text3);}
+.d-row .v{font-weight:600;}
+.d-row .v.or{color:var(--accent);}
+.new-btn{width:100%;padding:14px;background:var(--accent);border:none;border-radius:var(--rs);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;}
+.new-btn:hover{background:var(--accent2);}
 
-/* ── TOAST ── */
-.toast {
-  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
-  background:var(--surface2); border:1px solid var(--border); border-radius:100px;
-  padding:12px 20px; font-size:13px; z-index:9999;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
-  transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
-  white-space:nowrap; pointer-events:none;
-}
-.toast.show   { transform:translateX(-50%) translateY(0); }
-.toast.ok     { border-color:rgba(34,197,94,.4); }
-.toast.err    { border-color:rgba(239,68,68,.4); }
+/* PIX MODAL */
+.pix-modal{max-width:380px;}
+.pix-qr-wrap{background:white;border-radius:12px;padding:16px;margin:0 auto 16px;display:inline-block;}
+.pix-qr-wrap img{display:block;width:200px;height:200px;}
+.pix-code-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;font-family:monospace;font-size:11px;word-break:break-all;color:var(--text2);margin-bottom:12px;text-align:left;max-height:80px;overflow-y:auto;}
+.copy-btn{width:100%;padding:12px;background:var(--green);border:none;border-radius:var(--rs);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px;transition:all .2s;}
+.copy-btn:hover{background:#16a34a;}
+.pix-timer{font-size:12px;color:var(--text3);margin-bottom:16px;}
+.pix-status-check{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:16px;}
+.pix-steps{text-align:left;background:var(--surface2);border-radius:var(--rs);padding:14px;margin-bottom:16px;}
+.pix-steps p{font-size:12px;color:var(--text2);margin-bottom:6px;}
+.pix-steps li{font-size:12px;color:var(--text3);margin-left:16px;margin-bottom:4px;}
+.cancel-pix-btn{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:var(--rs);color:var(--text3);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+.cancel-pix-btn:hover{border-color:var(--red);color:var(--red);}
 
-/* ── SUCCESS OVERLAY ── */
-.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
-.overlay.show { display:flex; }
-.modal {
-  background:var(--surface); border:1px solid var(--border); border-radius:20px;
-  padding:40px; max-width:420px; width:90%; text-align:center;
-  animation:popIn .35s cubic-bezier(.175,.885,.32,1.275);
-}
-@keyframes popIn { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
-.modal-icon { width:72px; height:72px; background:rgba(34,197,94,.1); border:2px solid var(--green); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto 20px; }
-.modal h2   { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; margin-bottom:8px; }
-.modal p    { color:var(--text2); font-size:14px; line-height:1.6; margin-bottom:20px; }
-.detail     { background:var(--surface2); border-radius:var(--rs); padding:14px 16px; text-align:left; margin-bottom:24px; }
-.d-row      { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; }
-.d-row .k   { color:var(--text3); }
-.d-row .v   { font-weight:600; }
-.d-row .v.or { color:var(--accent); }
-.new-btn    { width:100%; padding:14px; background:var(--accent); border:none; border-radius:var(--rs); color:#fff; font-family:'Syne',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all .2s; }
-.new-btn:hover { background:var(--accent2); }
+/* ADMIN */
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:340px;text-align:center;animation:popIn .35s ease;}
+.login-box h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;}
+.login-box p{color:var(--text3);font-size:13px;margin-bottom:24px;}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 16px;outline:none;margin-bottom:10px;transition:border-color .2s;}
+.login-input:focus{border-color:var(--accent);}
+.login-btn{width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--rs);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
+.login-btn:hover{background:var(--accent2);}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none;}
+.dashboard{background:var(--surface);border-radius:20px;width:95vw;max-width:960px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;animation:popIn .35s ease;}
+.dash-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.dash-head h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.dash-head-r{display:flex;align-items:center;gap:10px;}
+.dash-close{background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dash-close:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.logout-btn{background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .2s;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:14px 16px;}
+.stat-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-family:'Syne',sans-serif;}
+.stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.stat-val.ac{color:var(--accent);}.stat-val.gr{color:var(--green);}.stat-val.yl{color:var(--yellow);}
+.filter-bar{display:flex;align-items:center;gap:10px;padding:12px 24px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.f-pill{padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;}
+.f-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.f-pill:hover:not(.active){border-color:var(--text3);color:var(--text);}
+.clr-btn{background:transparent;border:1px solid var(--border);color:var(--red);font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .2s;}
+.clr-btn:hover{background:rgba(239,68,68,.1);}
+.tbl-wrap{flex:1;overflow-y:auto;padding:0 24px 20px;}
+.rides-tbl{width:100%;border-collapse:collapse;margin-top:12px;}
+.rides-tbl th{text-align:left;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
+.rides-tbl td{padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;vertical-align:middle;}
+.rides-tbl tr:hover td{background:rgba(249,115,22,.04);}
+.del-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:4px;transition:all .2s;}
+.del-btn:hover{color:var(--red);background:rgba(239,68,68,.1);}
+.empty-st{text-align:center;padding:48px 0;color:var(--text3);}
+.empty-st div{font-size:40px;margin-bottom:12px;}
+.pay-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;}
+.pay-badge.pix{background:rgba(34,197,94,.12);color:var(--green);}
+.pay-badge.cash{background:rgba(234,179,8,.12);color:var(--yellow);}
+.pay-badge.card{background:rgba(96,165,250,.12);color:var(--blue);}
+.pay-badge.online{background:rgba(34,197,94,.2);color:var(--green);border:1px solid rgba(34,197,94,.3);}
 
-/* ── ADMIN ── */
-.login-box  { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:40px; width:340px; text-align:center; animation:popIn .35s ease; }
-.login-box h2 { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; margin-bottom:4px; }
-.login-box p  { color:var(--text3); font-size:13px; margin-bottom:24px; }
-.login-input  { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--rs); color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px; padding:12px 16px; outline:none; margin-bottom:10px; transition:border-color .2s; }
-.login-input:focus { border-color:var(--accent); }
-.login-btn    { width:100%; padding:13px; background:var(--accent); border:none; border-radius:var(--rs); color:#fff; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; }
-.login-btn:hover { background:var(--accent2); }
-.login-err    { color:var(--red); font-size:12px; margin-top:8px; display:none; }
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 
-.dashboard    { background:var(--surface); border-radius:20px; width:95vw; max-width:920px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; animation:popIn .35s ease; }
-.dash-head    { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.dash-head h2 { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; }
-.dash-head-r  { display:flex; align-items:center; gap:10px; }
-.dash-close   { background:var(--surface2); border:1px solid var(--border); color:var(--text2); width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
-.dash-close:hover { background:var(--red); color:#fff; border-color:var(--red); }
-.logout-btn   { background:transparent; border:1px solid var(--border); color:var(--text3); font-family:'DM Sans',sans-serif; font-size:12px; padding:6px 12px; border-radius:6px; cursor:pointer; transition:all .2s; }
-.logout-btn:hover { border-color:var(--red); color:var(--red); }
-
-.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:20px 24px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.stat-card  { background:var(--surface2); border:1px solid var(--border); border-radius:var(--rs); padding:14px 16px; }
-.stat-lbl   { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:6px; font-family:'Syne',sans-serif; }
-.stat-val   { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; }
-.stat-val.ac { color:var(--accent); } .stat-val.gr { color:var(--green); } .stat-val.yl { color:var(--yellow); }
-
-.filter-bar { display:flex; align-items:center; gap:10px; padding:12px 24px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.f-pill     { padding:6px 14px; border-radius:100px; border:1px solid var(--border); background:transparent; color:var(--text3); font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; transition:all .2s; }
-.f-pill.active { background:var(--accent); border-color:var(--accent); color:#fff; }
-.f-pill:hover:not(.active) { border-color:var(--text3); color:var(--text); }
-.clr-btn    { background:transparent; border:1px solid var(--border); color:var(--red); font-family:'DM Sans',sans-serif; font-size:12px; padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s; }
-.clr-btn:hover { background:rgba(239,68,68,.1); }
-
-.tbl-wrap   { flex:1; overflow-y:auto; padding:0 24px 20px; }
-.rides-tbl  { width:100%; border-collapse:collapse; margin-top:12px; }
-.rides-tbl th { text-align:left; font-family:'Syne',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); padding:8px 12px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface); z-index:1; }
-.rides-tbl td { padding:12px 12px; border-bottom:1px solid rgba(255,255,255,.04); font-size:13px; vertical-align:middle; }
-.rides-tbl tr:hover td { background:rgba(249,115,22,.04); }
-.del-btn    { background:transparent; border:none; color:var(--text3); cursor:pointer; font-size:14px; padding:4px 6px; border-radius:4px; transition:all .2s; }
-.del-btn:hover { color:var(--red); background:rgba(239,68,68,.1); }
-.empty-st   { text-align:center; padding:48px 0; color:var(--text3); }
-.empty-st div { font-size:40px; margin-bottom:12px; }
-
-/* ── MISC ── */
-.leaflet-container { background:#111 !important; }
-::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-
-@media(max-width:768px) {
-  .main { flex-direction:column; overflow:auto; } html,body { height:auto; overflow:auto; }
-  .sidebar { width:100%; min-width:unset; border-right:none; border-bottom:1px solid var(--border); max-height:none; overflow:visible; }
-  .sidebar-body { overflow:visible; }
-  #map { height:280px; flex:none; }
-  .stats-row { grid-template-columns:1fr 1fr; }
-  .dashboard { width:100vw; max-height:100vh; border-radius:0; }
+@media(max-width:768px){
+  .main{flex-direction:column;overflow:auto;}html,body{height:auto;overflow:auto;}
+  .sidebar{width:100%;min-width:unset;border-right:none;border-bottom:1px solid var(--border);max-height:none;overflow:visible;}
+  .sidebar-body{overflow:visible;}
+  #map{height:320px;flex:none;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .dashboard{width:100vw;max-height:100vh;border-radius:0;}
+  .rides-tbl th:nth-child(3),.rides-tbl td:nth-child(3){display:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo"><div class="logo-icon">🏍</div>Moto<span>Run</span></div>
   <div class="topbar-right">
@@ -256,29 +217,22 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
-
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-body">
 
       <div class="section-title">📍 Rota — Fortaleza CE</div>
 
-      <!-- ORIGEM -->
       <div class="field">
         <div class="f-label"><span class="dot-a">●</span> Ponto de Partida</div>
         <input class="f-input" id="origin" placeholder="Bairro ou rua em Fortaleza..." autocomplete="off" oninput="onInput(this,'ac-origin')">
-        <button class="f-btn" onclick="useGPS()" title="Usar minha localização">📍</button>
+        <button class="f-btn" onclick="useGPS()" title="Usar localização atual">📍</button>
         <div class="ac-list" id="ac-origin"></div>
       </div>
 
       <div class="connector"><div class="c-dot"></div><div class="c-bar"></div></div>
-
-      <!-- PARADAS -->
       <div id="stopsBox"></div>
 
-      <!-- DESTINO -->
       <div class="field">
         <div class="f-label"><span class="dot-b">●</span> Destino Final</div>
         <input class="f-input" id="dest" placeholder="Bairro ou rua em Fortaleza..." autocomplete="off" oninput="onInput(this,'ac-dest')">
@@ -289,17 +243,15 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
         + Adicionar Parada <span id="stopLbl">(0/3)</span>
       </button>
 
-      <!-- CALCULANDO -->
       <div class="calc-box" id="calcBox" style="display:none">
-        <div class="spinner"></div> Calculando rota...
+        <div class="spinner"></div> Calculando rota real...
       </div>
 
-      <!-- RESUMO DA ROTA -->
       <div id="routeInfo" style="display:none">
-        <div class="section-title">📊 Resumo da Corrida</div>
+        <div class="section-title">📊 Resumo</div>
         <div class="info-card">
-          <div class="info-row"><span class="k">🛣️ Distância</span><span class="v" id="rDist">—</span></div>
-          <div class="info-row"><span class="k">⏱️ Tempo estimado</span><span class="v green" id="rTime">—</span></div>
+          <div class="info-row"><span class="k">🛣️ Distância real</span><span class="v" id="rDist">—</span></div>
+          <div class="info-row"><span class="k">⏱️ Tempo estimado</span><span class="v gr" id="rTime">—</span></div>
           <div class="info-row"><span class="k">🛑 Paradas</span><span class="v" id="rStops">—</span></div>
           <div class="info-row" style="border-bottom:none">
             <span class="k">💰 Valor</span>
@@ -308,7 +260,6 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
         </div>
       </div>
 
-      <!-- DADOS PESSOAIS -->
       <div class="section-title">👤 Seus Dados</div>
       <div class="two-col">
         <div class="field" style="margin-bottom:0">
@@ -325,12 +276,16 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
         <textarea class="f-input" id="cNote" placeholder="Ex: frágil, portão lateral..."></textarea>
       </div>
 
-      <!-- PAGAMENTO -->
-      <div class="section-title" style="margin-top:4px">💳 Forma de Pagamento</div>
+      <div class="section-title" style="margin-top:4px">
+        💳 Pagamento
+      </div>
       <div class="pay-opts">
         <div class="pay-opt pix">
           <input type="radio" name="pay" id="pay-pix" value="Pix" checked>
-          <label for="pay-pix"><span class="pi">⚡</span><span class="pn">Pix</span></label>
+          <label for="pay-pix">
+            <span class="pi">⚡</span>
+            <span class="pn">Pix <span class="pix-online-badge">Online</span></span>
+          </label>
         </div>
         <div class="pay-opt cash">
           <input type="radio" name="pay" id="pay-cash" value="Dinheiro">
@@ -342,18 +297,19 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
         </div>
       </div>
 
-      <!-- BOTÃO -->
       <button class="submit-btn" onclick="submitReq()">🏍️ Solicitar Corrida</button>
-      <div style="font-size:11px;color:var(--text3);text-align:center;padding-bottom:16px">Confirmação via WhatsApp</div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;padding-bottom:16px">
+        Pix Online gera cobrança automática · Outros métodos via WhatsApp
+      </div>
 
     </div>
   </div>
 
-  <!-- MAPA -->
+  <!-- GOOGLE MAPS -->
   <div id="map"></div>
 </div>
 
-<!-- SUCCESS OVERLAY -->
+<!-- SUCCESS -->
 <div class="overlay" id="successOverlay">
   <div class="modal">
     <div class="modal-icon">✓</div>
@@ -364,9 +320,41 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
   </div>
 </div>
 
-<!-- ADMIN OVERLAY -->
+<!-- PIX MODAL -->
+<div class="overlay" id="pixOverlay">
+  <div class="modal pix-modal">
+    <h2>⚡ Pagar via Pix</h2>
+    <p style="margin-bottom:16px">Escaneie o QR Code ou copie o código</p>
+
+    <div class="pix-qr-wrap">
+      <img id="pixQrImg" src="" alt="QR Code Pix">
+    </div>
+
+    <div class="pix-code-box" id="pixCodeBox"></div>
+    <button class="copy-btn" onclick="copyPix()">📋 Copiar código Pix</button>
+
+    <div class="pix-steps">
+      <p><strong>Como pagar:</strong></p>
+      <ol>
+        <li>Abra o app do seu banco</li>
+        <li>Escolha pagar via Pix → QR Code ou Copia e Cola</li>
+        <li>Escaneie ou cole o código acima</li>
+        <li>Confirme o pagamento</li>
+      </ol>
+    </div>
+
+    <div class="pix-status-check">
+      <div class="spinner"></div>
+      <span id="pixStatusMsg">Aguardando pagamento...</span>
+    </div>
+    <div class="pix-timer" id="pixTimer"></div>
+
+    <button class="cancel-pix-btn" onclick="cancelPix()">Cancelar e pagar de outra forma</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
 <div class="overlay" id="adminOverlay">
-  <!-- LOGIN -->
   <div class="login-box" id="loginBox">
     <div style="font-size:36px;margin-bottom:12px">🏍️</div>
     <h2>Painel Admin</h2>
@@ -376,37 +364,33 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
     <div class="login-err" id="loginErr">Senha incorreta.</div>
     <div style="margin-top:16px"><button onclick="closeAdmin()" style="background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer">Cancelar</button></div>
   </div>
-  <!-- DASHBOARD -->
   <div class="dashboard" id="dashBox" style="display:none">
     <div class="dash-head">
-      <div>
-        <h2>📊 Dashboard de Corridas</h2>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px" id="dashPeriod"></div>
-      </div>
+      <div><h2>📊 Dashboard</h2><div style="font-size:12px;color:var(--text3);margin-top:2px" id="dashPeriod"></div></div>
       <div class="dash-head-r">
         <button class="logout-btn" onclick="doLogout()">Sair</button>
         <button class="dash-close" onclick="closeAdmin()">✕</button>
       </div>
     </div>
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-lbl">Total da Semana</div><div class="stat-val ac" id="sTotal">R$ 0,00</div></div>
+      <div class="stat-card"><div class="stat-lbl">Total Semana</div><div class="stat-val ac" id="sTotal">R$ 0,00</div></div>
       <div class="stat-card"><div class="stat-lbl">Corridas</div><div class="stat-val" id="sCount">0</div></div>
       <div class="stat-card"><div class="stat-lbl">Km Rodados</div><div class="stat-val yl" id="sKm">0 km</div></div>
       <div class="stat-card"><div class="stat-lbl">Ticket Médio</div><div class="stat-val gr" id="sAvg">R$ 0,00</div></div>
     </div>
     <div class="filter-bar">
-      <span style="font-size:12px;color:var(--text3)">Filtrar:</span>
-      <button class="f-pill active" onclick="setFilter('week',this)">Esta semana</button>
+      <span style="font-size:12px;color:var(--text3)">Período:</span>
+      <button class="f-pill active" onclick="setFilter('week',this)">Semana</button>
       <button class="f-pill" onclick="setFilter('today',this)">Hoje</button>
       <button class="f-pill" onclick="setFilter('all',this)">Todas</button>
       <div style="flex:1"></div>
-      <button class="clr-btn" onclick="clearRides()">🗑 Limpar tudo</button>
+      <button class="clr-btn" onclick="clearRides()">🗑 Limpar</button>
     </div>
     <div class="tbl-wrap">
       <table class="rides-tbl">
         <thead><tr>
-          <th>Cliente</th><th>Rota</th><th>Data / Hora</th>
-          <th>Distância</th><th>Pagamento</th><th>Valor</th><th></th>
+          <th>Cliente</th><th>Rota</th><th>Data/Hora</th>
+          <th>Km</th><th>Pagamento</th><th>Valor</th><th>Status</th><th></th>
         </tr></thead>
         <tbody id="ridesTbody"></tbody>
       </table>
@@ -415,65 +399,123 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
-
-<!-- LEAFLET -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════════════════
-   CONFIGURAÇÃO
-═══════════════════════════════════════════════════════ */
-const WHATSAPP = '5585999888735';   // ← seu número com DDI
+/* ════════════════════════════════════════════════════════
+   ⚙️  CONFIGURAÇÃO — edite aqui
+════════════════════════════════════════════════════════ */
+const WHATSAPP   = '5585999888735';   // seu número com DDI
 const PRECO_MIN  = 10.00;
 const FATOR_KM   = 1.60;
 const KM_BASE    = 5;
-const ADMIN_PASS = 'motorun2024';   // ← altere a senha admin
+const ADMIN_PASS = 'motorun2024';
 
-/* ═══════════════════════════════════════════════════════
-   MAPA (Leaflet + tiles escuros)
-═══════════════════════════════════════════════════════ */
-const map = L.map('map', { zoomControl:false }).setView([-3.7319, -38.5267], 12);
-L.control.zoom({ position:'bottomright' }).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:19
-}).addTo(map);
+// PagSeguro — configure em pagseguro.uol.com.br
+// 1. Crie conta em sandbox.pagseguro.uol.com.br (para testes)
+// 2. Depois use pagseguro.uol.com.br (produção)
+// 3. Gere o token em: Minha Conta → Preferências → Token de Segurança
+const PAGSEGURO_EMAIL = 'seu@email.com';      // ← seu email PagSeguro
+const PAGSEGURO_TOKEN = 'SEU_TOKEN_AQUI';     // ← token gerado no painel
+const PAGSEGURO_SANDBOX = true;               // ← mude para false em produção
+// IMPORTANTE: O endpoint precisa de um backend PHP/Node para chamar a API
+// do PagSeguro (não é possível chamar diretamente do browser por CORS)
+// Veja o exemplo de backend no comentário ao final deste arquivo.
+const BACKEND_URL = 'http://localhost/api/pix.php'; // ← seu backend
 
+/* ════════════════════════════════════════════════════════
+   GOOGLE MAPS
+════════════════════════════════════════════════════════ */
+let gmap, gmAC, gmPlaces, gmToken, gmBounds, gmReady = false;
+let directionsService, directionsRenderer;
 const mks = {};
-let routeLayer = null;
 
-function mkIcon(bg, txt) {
-  return L.divIcon({
-    className:'',
-    html:`<div style="width:34px;height:34px;background:${bg};border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)"><span style="transform:rotate(45deg);font-size:13px;font-weight:800;color:#000">${txt}</span></div>`,
-    iconSize:[34,34], iconAnchor:[17,34]
+function initGoogleMaps() {
+  gmBounds = new google.maps.LatLngBounds(
+    new google.maps.LatLng(-3.8392, -38.6272),
+    new google.maps.LatLng(-3.6942, -38.3860)
+  );
+  gmAC     = new google.maps.places.AutocompleteService();
+  gmPlaces = new google.maps.places.PlacesService(document.createElement('div'));
+  gmToken  = new google.maps.places.AutocompleteSessionToken();
+
+  // Inicializa o mapa Google Maps nativo
+  gmap = new google.maps.Map(document.getElementById('map'), {
+    center:    { lat: -3.7319, lng: -38.5267 },
+    zoom:      12,
+    mapTypeId: 'roadmap',
+    styles: [
+      { elementType:'geometry',        stylers:[{color:'#1a1a1a'}] },
+      { elementType:'labels.text.fill',stylers:[{color:'#757575'}] },
+      { elementType:'labels.text.stroke',stylers:[{color:'#212121'}] },
+      { featureType:'road',            elementType:'geometry',      stylers:[{color:'#2c2c2c'}] },
+      { featureType:'road.arterial',   elementType:'geometry',      stylers:[{color:'#373737'}] },
+      { featureType:'road.highway',    elementType:'geometry',      stylers:[{color:'#3c3c3c'}] },
+      { featureType:'road',            elementType:'labels.text.fill', stylers:[{color:'#9e9e9e'}] },
+      { featureType:'water',           elementType:'geometry',      stylers:[{color:'#0f0f0f'}] },
+      { featureType:'poi',             elementType:'geometry',      stylers:[{color:'#1c1c1c'}] },
+      { featureType:'poi.park',        elementType:'geometry',      stylers:[{color:'#1a2a1a'}] },
+      { featureType:'transit',         elementType:'geometry',      stylers:[{color:'#1a1a1a'}] },
+      { featureType:'administrative',  elementType:'geometry',      stylers:[{color:'#333'}] },
+    ],
+    disableDefaultUI: false,
+    zoomControl:  true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+  });
+
+  // Directions renderer — desenha rota colorida no mapa
+  directionsService  = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    map: gmap,
+    suppressMarkers: true,  // usamos nossos próprios marcadores
+    polylineOptions: {
+      strokeColor:   '#f97316',
+      strokeWeight:  5,
+      strokeOpacity: 0.9
+    }
+  });
+
+  gmReady = true;
+}
+
+/* ── Marcadores personalizados ── */
+function mkIcon(bg, label) {
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="44" viewBox="0 0 34 44">
+        <path d="M17 0C7.6 0 0 7.6 0 17c0 13 17 27 17 27S34 30 34 17C34 7.6 26.4 0 17 0z" fill="${bg}"/>
+        <text x="17" y="22" text-anchor="middle" font-family="Arial Black,sans-serif"
+          font-weight="900" font-size="14" fill="#000">${label}</text>
+      </svg>`)}`,
+    scaledSize: new google.maps.Size(34, 44),
+    anchor:     new google.maps.Point(17, 44),
+  };
+}
+
+function setMk(id, latLng, title, bgColor, label) {
+  if (mks[id]) mks[id].setMap(null);
+  mks[id] = new google.maps.Marker({
+    position: latLng, map: gmap, title,
+    icon:     mkIcon(bgColor, label),
+    animation: google.maps.Animation.DROP
   });
 }
-const IC = {
-  origin: mkIcon('#22c55e','A'),
-  dest:   mkIcon('#ef4444','B'),
-  s0: mkIcon('#eab308','1'), s1: mkIcon('#eab308','2'), s2: mkIcon('#eab308','3')
-};
+function delMk(id) { if (mks[id]) { mks[id].setMap(null); delete mks[id]; } }
 
-function setMk(id, ll, label) {
-  if (mks[id]) map.removeLayer(mks[id]);
-  mks[id] = L.marker(ll, { icon: IC[id] || IC.dest }).addTo(map).bindPopup(`<b>${label}</b>`).openPopup();
-}
-function delMk(id) { if (mks[id]) { map.removeLayer(mks[id]); delete mks[id]; } }
-
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    ESTADO
-═══════════════════════════════════════════════════════ */
+════════════════════════════════════════════════════════ */
 let originLL = null, destLL = null;
-let stops    = [], stopCnt = 0;
-let lastRoute = null;
+let stops = [], stopCnt = 0, lastRoute = null;
+const acTimers = {};
 
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    PARADAS
-═══════════════════════════════════════════════════════ */
+════════════════════════════════════════════════════════ */
 function addStop() {
   if (stops.length >= 3) return;
   const n = stopCnt++, id = `s${n}`, wid = `w${n}`;
@@ -508,30 +550,9 @@ function relabel() {
   });
 }
 
-/* ═══════════════════════════════════════════════════════
-   GOOGLE MAPS PLACES — autocomplete restrito a Fortaleza
-═══════════════════════════════════════════════════════ */
-let gmReady  = false;
-let gmAC     = null;   // AutocompleteService
-let gmPlaces = null;   // PlacesService
-let gmToken  = null;   // SessionToken
-let gmBounds = null;   // LatLngBounds de Fortaleza
-
-// Chamado automaticamente pelo callback da API do Google
-function initGoogleMaps() {
-  gmBounds = new google.maps.LatLngBounds(
-    new google.maps.LatLng(-3.8392, -38.6272),  // SW
-    new google.maps.LatLng(-3.6942, -38.3860)   // NE
-  );
-  gmAC     = new google.maps.places.AutocompleteService();
-  gmPlaces = new google.maps.places.PlacesService(document.createElement('div'));
-  gmToken  = new google.maps.places.AutocompleteSessionToken();
-  gmReady  = true;
-}
-
-/* Timers de debounce por campo */
-const acTimers = {};
-
+/* ════════════════════════════════════════════════════════
+   AUTOCOMPLETE — Google Places restrito a Fortaleza
+════════════════════════════════════════════════════════ */
 function onInput(inp, acId) {
   const val = inp.value.trim();
   clearTimeout(acTimers[acId]);
@@ -541,43 +562,35 @@ function onInput(inp, acId) {
 }
 
 function doSearch(query, acId, inp) {
-  if (!gmReady) { showAC(acId, null, inp); return; }
+  if (!gmReady) { showACEmpty(acId, 'Carregando mapas...'); return; }
 
-  // Usa bounds como BIAS (preferência) e componentRestrictions para BR
-  // strictBounds removido pois bloqueava ruas válidas de Fortaleza
   gmAC.getPlacePredictions({
-    input:                 query + ', Fortaleza',
+    input:                 query + ', Fortaleza, Ceará',
     sessionToken:          gmToken,
     bounds:                gmBounds,
-    componentRestrictions: { country:'br' },
+    componentRestrictions: { country: 'br' },
     language:              'pt-BR'
   }, (preds, status) => {
     if (status !== google.maps.places.PlacesServiceStatus.OK || !preds?.length) {
-      showAC(acId, [], inp); return;
+      showACEmpty(acId, 'Nenhum endereço encontrado em Fortaleza'); return;
     }
-    // Filtro: só exibe resultados que mencionam Fortaleza ou Ceará
     const filtered = preds.filter(p => {
       const d = p.description.toLowerCase();
       return d.includes('fortaleza') || d.includes('cear');
     });
-    // Se o filtro eliminou tudo, mostra os originais (evita "nenhum resultado" falso)
-    showAC(acId, filtered.length ? filtered : preds, inp);
+    showACPreds(acId, filtered.length ? filtered : preds, inp);
   });
 }
 
-function showAC(acId, preds, inp) {
+function showACEmpty(acId, msg) {
+  const list = document.getElementById(acId);
+  list.innerHTML = `<div class="ac-item ac-empty">${msg}</div>`;
+  list.classList.add('open');
+}
+
+function showACPreds(acId, preds, inp) {
   const list = document.getElementById(acId);
   list.innerHTML = '';
-  if (!preds || !preds.length) {
-    const d = document.createElement('div');
-    d.className = 'ac-item ac-empty';
-    d.textContent = gmReady
-      ? 'Nenhum endereço encontrado em Fortaleza'
-      : 'Aguarde, carregando mapas...';
-    list.appendChild(d);
-    list.classList.add('open');
-    return;
-  }
   preds.forEach(p => {
     const item = document.createElement('div');
     item.className = 'ac-item';
@@ -600,352 +613,449 @@ document.addEventListener('click', e => {
 
 function pickPlace(inp, acId, placeId) {
   closeAC(acId);
-  if (!gmPlaces) return;
-
   gmPlaces.getDetails(
     { placeId, fields:['geometry','address_components','name','formatted_address'], sessionToken:gmToken },
     (place, status) => {
-      // Renova token após cada seleção (boas práticas Google)
       gmToken = new google.maps.places.AutocompleteSessionToken();
-
       if (status !== google.maps.places.PlacesServiceStatus.OK || !place?.geometry) {
         toast('Não foi possível obter o endereço.', 'err'); return;
       }
-
-      // Verifica se está em Fortaleza via address_components
       const comps  = place.address_components || [];
       const cidade = comps.find(c => c.types.includes('administrative_area_level_2'));
       if (cidade && cidade.long_name !== 'Fortaleza') {
         toast('⚠️ Endereço fora de Fortaleza.', 'err'); return;
       }
-
-      // Monta label amigável
       const rua    = comps.find(c => c.types.includes('route'))?.long_name || '';
       const num    = comps.find(c => c.types.includes('street_number'))?.long_name || '';
-      const bairro = comps.find(c => c.types.includes('sublocality') || c.types.includes('neighborhood'))?.long_name || '';
+      const bairro = comps.find(c => c.types.includes('sublocality_level_1') || c.types.includes('sublocality') || c.types.includes('neighborhood'))?.long_name || '';
       inp.value = rua
-        ? `${rua}${num ? ', '+num : ''}${bairro ? ' — '+bairro : ''}`
+        ? `${rua}${num?', '+num:''}${bairro?' — '+bairro:''}`
         : (place.name || place.formatted_address?.split(',')[0] || '');
 
-      const ll = [place.geometry.location.lat(), place.geometry.location.lng()];
+      const latLng = place.geometry.location;
+      const ll     = [latLng.lat(), latLng.lng()];
 
       if (inp.id === 'origin') {
         originLL = ll;
-        setMk('origin', ll, '🏠 Partida');
+        setMk('origin', latLng, 'Partida', '#22c55e', 'A');
       } else if (inp.id === 'dest') {
         destLL = ll;
-        setMk('dest', ll, '🏁 Destino');
+        setMk('dest', latLng, 'Destino', '#ef4444', 'B');
       } else {
         const stop = stops.find(s => s.id === inp.id);
-        if (stop) { stop.ll = ll; stop.addr = inp.value; setMk(stop.id, ll, '📍 Parada'); }
+        if (stop) {
+          stop.ll = ll; stop.addr = inp.value;
+          const si = stops.indexOf(stop);
+          setMk(stop.id, latLng, `Parada ${si+1}`, '#eab308', `${si+1}`);
+        }
       }
       recalc();
     }
   );
 }
 
-/* ═══════════════════════════════════════════════════════
-   GPS — usa Google Geocoder para reverter coordenadas
-═══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   GPS — Google Geocoder
+════════════════════════════════════════════════════════ */
 function useGPS() {
   if (!navigator.geolocation) { toast('Geolocalização não suportada.', 'err'); return; }
   toast('📍 Obtendo localização...', '');
   navigator.geolocation.getCurrentPosition(pos => {
-    if (!gmReady) { toast('Mapas ainda carregando, tente em segundos.', 'err'); return; }
+    if (!gmReady) { toast('Mapas ainda carregando, tente novamente.', 'err'); return; }
     const lat = pos.coords.latitude, lon = pos.coords.longitude;
-    originLL = [lat, lon];
-
+    originLL  = [lat, lon];
+    const latlng = new google.maps.LatLng(lat, lon);
     const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location:{ lat, lng:lon }, language:'pt-BR', region:'BR' }, (results, status) => {
+    geocoder.geocode({ location: latlng, language: 'pt-BR', region: 'BR' }, (results, status) => {
       if (status === 'OK' && results[0]) {
         const comps  = results[0].address_components || [];
         const cidade = comps.find(c => c.types.includes('administrative_area_level_2'));
-        if (cidade && cidade.long_name !== 'Fortaleza') {
-          toast('⚠️ Você está fora de Fortaleza.', 'err');
-        }
-        // Monta endereço amigável: rua + número + bairro
+        if (cidade && cidade.long_name !== 'Fortaleza') toast('⚠️ Você está fora de Fortaleza.', 'err');
         const rua    = comps.find(c => c.types.includes('route'))?.long_name || '';
         const num    = comps.find(c => c.types.includes('street_number'))?.long_name || '';
-        const bairro = comps.find(c =>
-          c.types.includes('sublocality_level_1') ||
-          c.types.includes('sublocality') ||
-          c.types.includes('neighborhood') ||
-          c.types.includes('political')
-        )?.long_name || '';
-        // Prioridade: rua → formatted_address → coordenadas
-        if (rua) {
-          document.getElementById('origin').value = `${rua}${num ? ', '+num : ''}${bairro ? ' — '+bairro : ''}`;
-        } else if (results[0].formatted_address) {
-          // Pega apenas as 2 primeiras partes do endereço formatado
-          document.getElementById('origin').value = results[0].formatted_address.split(',').slice(0,2).join(',').trim();
-        } else {
-          document.getElementById('origin').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-        }
+        const bairro = comps.find(c => c.types.includes('sublocality_level_1') || c.types.includes('sublocality') || c.types.includes('neighborhood'))?.long_name || '';
+        document.getElementById('origin').value = rua
+          ? `${rua}${num?', '+num:''}${bairro?' — '+bairro:''}`
+          : results[0].formatted_address.split(',').slice(0,2).join(',').trim();
       } else {
         document.getElementById('origin').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
       }
-      setMk('origin', originLL, '🏠 Sua localização');
-      map.setView(originLL, 15);
-      recalc();
-      toast('✅ Localização obtida!', 'ok');
+      setMk('origin', latlng, 'Sua localização', '#22c55e', 'A');
+      gmap.panTo(latlng); gmap.setZoom(15);
+      recalc(); toast('✅ Localização obtida!', 'ok');
     });
   }, () => toast('Não foi possível obter localização.', 'err'));
 }
 
-/* ═══════════════════════════════════════════════════════
-   OTIMIZAÇÃO DE PARADAS (permutações — máx 6 combinações)
-═══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   OTIMIZAÇÃO DE PARADAS
+════════════════════════════════════════════════════════ */
 function perms(arr) {
   if (arr.length <= 1) return [arr];
   return arr.flatMap((x, i) => perms([...arr.slice(0,i), ...arr.slice(i+1)]).map(p => [x,...p]));
 }
 
-function haversine([a, b], [c, d]) {
-  const R = 6371, dLat=(c-a)*Math.PI/180, dLon=(d-b)*Math.PI/180;
-  return R*2*Math.atan2(Math.sqrt(Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2), Math.sqrt(1-Math.sin(dLat/2)**2-Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2));
+function haversine([a,b],[c,d]) {
+  const R=6371, dL=(c-a)*Math.PI/180, dl=(d-b)*Math.PI/180;
+  const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 
 function optimizeStops(active) {
   if (active.length <= 1) return active;
-  let best = active, bestD = Infinity;
+  let best=active, bestD=Infinity;
   perms(active).forEach(p => {
-    const pts = [originLL, ...p.map(s=>s.ll), destLL];
-    const d = pts.slice(1).reduce((s,_,i)=>s+haversine(pts[i],pts[i+1]),0);
-    if (d < bestD) { bestD=d; best=p; }
+    const pts=[originLL,...p.map(s=>s.ll),destLL];
+    const d=pts.slice(1).reduce((s,_,i)=>s+haversine(pts[i],pts[i+1]),0);
+    if(d<bestD){bestD=d;best=p;}
   });
   return best;
 }
 
 function applyOrder(ordered) {
-  const box = document.getElementById('stopsBox');
-  ordered.forEach(s => { const el=document.getElementById('w'+s.id.slice(1)); if(el) box.appendChild(el); });
-  stops = [...ordered, ...stops.filter(s=>!s.ll)];
+  const box=document.getElementById('stopsBox');
+  ordered.forEach(s=>{const el=document.getElementById('w'+s.id.slice(1));if(el)box.appendChild(el);});
+  stops=[...ordered,...stops.filter(s=>!s.ll)];
   relabel();
-  toast('✨ Paradas reordenadas para rota mais eficiente!', 'ok');
+  toast('✨ Paradas reordenadas para rota mais eficiente!','ok');
 }
 
-/* ═══════════════════════════════════════════════════════
-   ROTA (Haversine — sem ORS, linha reta + 25%)
-═══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   ROTA REAL — Google Directions API
+════════════════════════════════════════════════════════ */
 let calcTimer = null;
 
 function recalc() {
   clearTimeout(calcTimer);
-  calcTimer = setTimeout(doRoute, 600);
+  calcTimer = setTimeout(doRoute, 700);
 }
 
 function doRoute() {
-  if (!originLL || !destLL) { hideRoute(); return; }
+  if (!originLL || !destLL || !gmReady) { hideRoute(); return; }
 
-  const active = stops.filter(s => s.ll);
-  let ordered  = active;
-
+  const active  = stops.filter(s => s.ll);
+  let   ordered = active;
   if (active.length > 1) {
     ordered = optimizeStops(active);
     const changed = ordered.some((s,i) => s.id !== active[i]?.id);
     if (changed) applyOrder(ordered);
   }
 
-  const wps = [originLL, ...ordered.map(s=>s.ll), destLL];
-  document.getElementById('calcBox').style.display = 'flex';
+  document.getElementById('calcBox').style.display  = 'flex';
   document.getElementById('routeInfo').style.display = 'none';
 
-  // Calcula distância haversine entre todos os pontos + 25% p/ ruas
-  let km = 0;
-  for (let i=0;i<wps.length-1;i++) km += haversine(wps[i],wps[i+1]);
-  km *= 1.25;
+  const waypts = ordered.map(s => ({
+    location: new google.maps.LatLng(s.ll[0], s.ll[1]),
+    stopover: true
+  }));
 
-  const sec = (km / 30) * 3600; // estimativa 30km/h moto
+  directionsService.route({
+    origin:      new google.maps.LatLng(originLL[0], originLL[1]),
+    destination: new google.maps.LatLng(destLL[0], destLL[1]),
+    waypoints:   waypts,
+    optimizeWaypoints: false,
+    travelMode:  google.maps.TravelMode.DRIVING,
+    region:      'BR',
+    language:    'pt-BR'
+  }, (result, status) => {
+    document.getElementById('calcBox').style.display = 'none';
+    if (status === google.maps.DirectionsStatus.OK) {
+      directionsRenderer.setDirections(result);
 
-  // Desenha linha tracejada no mapa
-  if (routeLayer) map.removeLayer(routeLayer);
-  L.polyline(wps, { color:'#f97316', weight:8, opacity:.12 }).addTo(map);
-  routeLayer = L.polyline(wps, { color:'#f97316', weight:3, opacity:.9 }).addTo(map);
-  map.fitBounds(wps, { padding:[40,40] });
+      const legs = result.routes[0].legs;
+      let totalM=0, totalSec=0;
+      legs.forEach(l => { totalM+=l.distance.value; totalSec+=l.duration.value; });
 
-  const price = km <= KM_BASE ? PRECO_MIN : PRECO_MIN + (km - KM_BASE) * FATOR_KM;
-  const mins  = Math.round(sec/60), h=Math.floor(mins/60), m=mins%60;
-  const note  = km <= KM_BASE
-    ? `Valor mínimo (até ${KM_BASE}km)`
-    : `R$${PRECO_MIN.toFixed(2)} base + ${(km-KM_BASE).toFixed(1)}km × R$${FATOR_KM.toFixed(2)}/km`;
+      const km    = totalM / 1000;
+      const price = km <= KM_BASE ? PRECO_MIN : PRECO_MIN + (km-KM_BASE)*FATOR_KM;
+      const mins  = Math.round(totalSec/60), h=Math.floor(mins/60), m=mins%60;
 
-  document.getElementById('calcBox').style.display  = 'none';
-  document.getElementById('routeInfo').style.display = 'block';
-  document.getElementById('rDist').textContent  = `${km.toFixed(1)} km (aprox.)`;
-  document.getElementById('rTime').textContent  = h>0?`${h}h ${m}min`:`${mins} min`;
-  document.getElementById('rStops').textContent = ordered.length || 'Nenhuma';
-  document.getElementById('rPrice').textContent = `R$ ${price.toFixed(2)}`;
-  document.getElementById('rNote').textContent  = note;
+      document.getElementById('routeInfo').style.display = 'block';
+      document.getElementById('rDist').textContent  = `${km.toFixed(1)} km`;
+      document.getElementById('rTime').textContent  = h>0?`${h}h ${m}min`:`${mins} min`;
+      document.getElementById('rStops').textContent = ordered.length || 'Nenhuma';
+      document.getElementById('rPrice').textContent = `R$ ${price.toFixed(2)}`;
+      document.getElementById('rNote').textContent  = km<=KM_BASE
+        ? `Valor mínimo (até ${KM_BASE}km)`
+        : `R$${PRECO_MIN.toFixed(2)} base + ${(km-KM_BASE).toFixed(1)}km × R$${FATOR_KM.toFixed(2)}/km`;
 
-  lastRoute = { km, sec, price };
+      lastRoute = { km, sec:totalSec, price };
+    } else {
+      toast('Erro ao calcular rota. Verifique os endereços.','err');
+      hideRoute();
+    }
+  });
 }
 
 function hideRoute() {
   document.getElementById('calcBox').style.display  = 'none';
   document.getElementById('routeInfo').style.display = 'none';
-  if (routeLayer) { map.removeLayer(routeLayer); routeLayer=null; }
+  if (directionsRenderer) directionsRenderer.setDirections({ routes:[] });
   lastRoute = null;
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    PHONE MASK
-═══════════════════════════════════════════════════════ */
+════════════════════════════════════════════════════════ */
 function maskPhone(inp) {
-  let v = inp.value.replace(/\D/g,'').slice(0,11);
-  if (v.length>10) v=v.replace(/^(\d{2})(\d{5})(\d{4})$/,'($1) $2-$3');
-  else if (v.length>6) v=v.replace(/^(\d{2})(\d{4})(\d*)$/,'($1) $2-$3');
-  else if (v.length>2) v=v.replace(/^(\d{2})(\d*)$/,'($1) $2');
+  let v=inp.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10) v=v.replace(/^(\d{2})(\d{5})(\d{4})$/,'($1) $2-$3');
+  else if(v.length>6) v=v.replace(/^(\d{2})(\d{4})(\d*)$/,'($1) $2-$3');
+  else if(v.length>2) v=v.replace(/^(\d{2})(\d*)$/,'($1) $2');
   inp.value=v;
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    SUBMIT
-═══════════════════════════════════════════════════════ */
-function submitReq() {
+════════════════════════════════════════════════════════ */
+async function submitReq() {
   const name    = document.getElementById('cName').value.trim();
   const phone   = document.getElementById('cPhone').value.trim();
   const note    = document.getElementById('cNote').value.trim();
   const payment = document.querySelector('input[name="pay"]:checked')?.value || 'Pix';
 
-  if (!name)     { toast('⚠️ Informe seu nome.', 'err'); return; }
-  if (!phone)    { toast('⚠️ Informe seu WhatsApp.', 'err'); return; }
-  if (!originLL) { toast('⚠️ Defina o ponto de partida.', 'err'); return; }
-  if (!destLL)   { toast('⚠️ Defina o destino.', 'err'); return; }
-  if (!lastRoute){ toast('⚠️ Aguarde o cálculo da rota.', 'err'); return; }
+  if (!name)     { toast('⚠️ Informe seu nome.','err'); return; }
+  if (!phone)    { toast('⚠️ Informe seu WhatsApp.','err'); return; }
+  if (!originLL) { toast('⚠️ Defina o ponto de partida.','err'); return; }
+  if (!destLL)   { toast('⚠️ Defina o destino.','err'); return; }
+  if (!lastRoute){ toast('⚠️ Aguarde o cálculo da rota.','err'); return; }
 
   const { km, sec, price } = lastRoute;
   const mins   = Math.round(sec/60);
   const origin = document.getElementById('origin').value;
   const dest   = document.getElementById('dest').value;
-  const stopsLines = stops.filter(s=>s.ll).map((s,i)=>`Parada ${i+1}: ${document.getElementById(s.id)?.value||s.addr}`);
+  const stopLines = stops.filter(s=>s.ll).map((s,i)=>`Parada ${i+1}: ${document.getElementById(s.id)?.value||s.addr}`);
+  const rideData  = { name, phone, note, payment, origin, dest, stops:stops.filter(s=>s.ll).length||null, km, price, durMin:mins };
 
-  const lines = [
-    '🏍️ *NOVA CORRIDA — MotoRun*','',
-    `👤 *Cliente:* ${name}`,
-    `📞 *Telefone:* ${phone}`,'',
-    `📍 *Partida:* ${origin}`,
-    ...stopsLines,
-    `🏁 *Destino:* ${dest}`,'',
-    `🛣️ *Distância:* ${km.toFixed(1)} km`,
-    `⏱️ *Tempo est.:* ${mins} min`,
-    `💰 *Valor:* R$ ${price.toFixed(2)}`,
-    `💳 *Pagamento:* ${payment}`,
-    ...(note ? [`📝 *Obs:* ${note}`] : [])
-  ];
-
-  const payIcons = { Pix:'⚡', Dinheiro:'💵', Cartão:'💳' };
-  document.getElementById('successDetail').innerHTML = `
-    <div class="d-row"><span class="k">Cliente</span><span class="v">${name}</span></div>
-    <div class="d-row"><span class="k">Distância</span><span class="v">${km.toFixed(1)} km</span></div>
-    <div class="d-row"><span class="k">Tempo est.</span><span class="v">${mins} min</span></div>
-    <div class="d-row"><span class="k">Valor</span><span class="v or">R$ ${price.toFixed(2)}</span></div>
-    <div class="d-row"><span class="k">Pagamento</span><span class="v">${payIcons[payment]||''} ${payment}</span></div>`;
-
-  document.getElementById('successOverlay').classList.add('show');
-
-  saveRide({ name, phone, origin, dest, stops: stops.filter(s=>s.ll).length||null, km, price, durMin:mins, note, payment });
-
-  setTimeout(() => window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank'), 500);
+  if (payment === 'Pix') {
+    // Gera cobrança Pix via PagSeguro
+    await startPixPayment(rideData);
+  } else {
+    // Dinheiro ou Cartão — envia WhatsApp direto
+    finishWithWhatsApp(rideData);
+  }
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
+   PIX — PagSeguro
+════════════════════════════════════════════════════════ */
+let pixCheckInterval = null;
+let pixOrderId       = null;
+let pixExpiresAt     = null;
+let currentRide      = null;
+
+async function startPixPayment(ride) {
+  currentRide = ride;
+  toast('Gerando cobrança Pix...','');
+
+  try {
+    // Chama seu backend que acessa a API do PagSeguro
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action:      'create_pix',
+        amount:      ride.price.toFixed(2),
+        description: `MotoRun - ${ride.origin} → ${ride.dest}`,
+        customer:    { name: ride.name, phone: ride.phone }
+      })
+    });
+
+    if (!res.ok) throw new Error('Backend indisponível');
+    const data = await res.json();
+
+    if (!data.qr_code) throw new Error(data.error || 'Erro ao gerar Pix');
+
+    // Exibe modal do Pix
+    pixOrderId   = data.order_id;
+    pixExpiresAt = Date.now() + 15 * 60 * 1000; // 15 min
+
+    document.getElementById('pixQrImg').src    = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_code)}`;
+    document.getElementById('pixCodeBox').textContent = data.qr_code;
+    document.getElementById('pixStatusMsg').textContent = 'Aguardando pagamento...';
+    document.getElementById('pixOverlay').classList.add('show');
+
+    startPixTimer();
+    startPixCheck();
+
+  } catch(e) {
+    // Se backend não estiver configurado, mostra instruções
+    if (BACKEND_URL.includes('localhost') || PAGSEGURO_TOKEN === 'SEU_TOKEN_AQUI') {
+      showPixSetupModal(ride);
+    } else {
+      toast('Erro ao gerar Pix. Tente outro método.','err');
+    }
+  }
+}
+
+function showPixSetupModal(ride) {
+  // Fallback: mostra modal informando que precisa configurar o backend
+  document.getElementById('pixQrImg').src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="#1c1c1c" rx="12"/>
+      <text x="100" y="85" text-anchor="middle" font-family="Arial" font-size="40">⚡</text>
+      <text x="100" y="115" text-anchor="middle" font-family="Arial" font-size="13" fill="#a3a3a3">Configure o</text>
+      <text x="100" y="133" text-anchor="middle" font-family="Arial" font-size="13" fill="#a3a3a3">backend PHP</text>
+    </svg>`);
+  document.getElementById('pixCodeBox').textContent = '⚠️ Backend não configurado. Veja as instruções no código para integrar o PagSeguro.';
+  document.getElementById('pixStatusMsg').textContent = 'Configure o backend para ativar o Pix Online';
+  document.getElementById('pixOverlay').classList.add('show');
+}
+
+function startPixTimer() {
+  const el = document.getElementById('pixTimer');
+  const tick = () => {
+    const left = Math.max(0, pixExpiresAt - Date.now());
+    const m = Math.floor(left/60000), s = Math.floor((left%60000)/1000);
+    el.textContent = left > 0 ? `Expira em ${m}:${s.toString().padStart(2,'0')}` : 'Pix expirado';
+    if (left > 0) setTimeout(tick, 1000); else cancelPix();
+  };
+  tick();
+}
+
+function startPixCheck() {
+  if (!pixOrderId || BACKEND_URL.includes('localhost')) return;
+  pixCheckInterval = setInterval(async () => {
+    try {
+      const res  = await fetch(`${BACKEND_URL}?action=check_pix&order_id=${pixOrderId}`);
+      const data = await res.json();
+      if (data.paid) {
+        clearInterval(pixCheckInterval);
+        onPixPaid();
+      }
+    } catch(e) {}
+  }, 5000);
+}
+
+function onPixPaid() {
+  document.getElementById('pixOverlay').classList.remove('show');
+  document.getElementById('pixStatusMsg').textContent = 'Pago!';
+  currentRide.pixPaid = true;
+  finishWithWhatsApp(currentRide);
+  showSuccessModal(currentRide);
+}
+
+function copyPix() {
+  const code = document.getElementById('pixCodeBox').textContent;
+  navigator.clipboard.writeText(code).then(() => toast('✅ Código copiado!','ok')).catch(()=>{});
+}
+
+function cancelPix() {
+  clearInterval(pixCheckInterval);
+  document.getElementById('pixOverlay').classList.remove('show');
+  toast('Pix cancelado. Escolha outro método.','');
+}
+
+/* ════════════════════════════════════════════════════════
+   WHATSAPP + SUCCESS
+════════════════════════════════════════════════════════ */
+function finishWithWhatsApp(ride) {
+  const PI = {Pix:'⚡',Dinheiro:'💵',Cartão:'💳'};
+  const stopLines = stops.filter(s=>s.ll).map((s,i)=>`Parada ${i+1}: ${document.getElementById(s.id)?.value||s.addr}`);
+  const lines = [
+    '🏍️ *NOVA CORRIDA — MotoRun*','',
+    `👤 *Cliente:* ${ride.name}`,
+    `📞 *Tel:* ${ride.phone}`,'',
+    `📍 *Partida:* ${ride.origin}`,
+    ...stopLines,
+    `🏁 *Destino:* ${ride.dest}`,'',
+    `🛣️ *Distância:* ${ride.km.toFixed(1)} km`,
+    `⏱️ *Tempo:* ${ride.durMin} min`,
+    `💰 *Valor:* R$ ${ride.price.toFixed(2)}`,
+    `💳 *Pagamento:* ${PI[ride.payment]||''} ${ride.payment}${ride.pixPaid?' ✅ PAGO':''}`,
+    ...(ride.note?[`📝 *Obs:* ${ride.note}`]:[])
+  ];
+  setTimeout(()=>window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`,'_blank'),500);
+  saveRide(ride);
+  if (ride.payment !== 'Pix') showSuccessModal(ride);
+}
+
+function showSuccessModal(ride) {
+  const PI = {Pix:'⚡',Dinheiro:'💵',Cartão:'💳'};
+  document.getElementById('successDetail').innerHTML = `
+    <div class="d-row"><span class="k">Cliente</span><span class="v">${ride.name}</span></div>
+    <div class="d-row"><span class="k">Distância</span><span class="v">${ride.km.toFixed(1)} km</span></div>
+    <div class="d-row"><span class="k">Tempo est.</span><span class="v">${ride.durMin} min</span></div>
+    <div class="d-row"><span class="k">Valor</span><span class="v or">R$ ${ride.price.toFixed(2)}</span></div>
+    <div class="d-row"><span class="k">Pagamento</span><span class="v">${PI[ride.payment]||''} ${ride.payment}${ride.pixPaid?' <span style="color:var(--green)">✅ Pago</span>':''}</span></div>`;
+  document.getElementById('successOverlay').classList.add('show');
+}
+
+/* ════════════════════════════════════════════════════════
    RESET
-═══════════════════════════════════════════════════════ */
+════════════════════════════════════════════════════════ */
 function resetAll() {
   document.getElementById('successOverlay').classList.remove('show');
-  ['origin','dest','cName','cPhone','cNote'].forEach(id => document.getElementById(id).value='');
+  ['origin','dest','cName','cPhone','cNote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('stopsBox').innerHTML='';
   document.getElementById('pay-pix').checked=true;
   stops=[]; stopCnt=0; relabel();
   originLL=null; destLL=null; lastRoute=null;
-  Object.keys(mks).forEach(k => map.removeLayer(mks[k]));
-  Object.keys(mks).forEach(k => delete mks[k]);
-  if (routeLayer) { map.removeLayer(routeLayer); routeLayer=null; }
+  Object.keys(mks).forEach(k=>{ mks[k].setMap(null); delete mks[k]; });
+  if (directionsRenderer) directionsRenderer.setDirections({routes:[]});
   hideRoute();
-  map.setView([-3.7319,-38.5267],12);
+  if (gmap) gmap.setCenter({lat:-3.7319,lng:-38.5267}), gmap.setZoom(12);
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    TOAST
-═══════════════════════════════════════════════════════ */
+════════════════════════════════════════════════════════ */
 let toastT;
-function toast(msg, type='') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast ${type} show`;
-  clearTimeout(toastT);
-  toastT = setTimeout(()=>el.classList.remove('show'), 3200);
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast ${type} show`;
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3200);
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    ADMIN — localStorage
-═══════════════════════════════════════════════════════ */
-const STORAGE_KEY = 'motorun_rides';
-let adminLogged   = false;
-let curFilter     = 'week';
+════════════════════════════════════════════════════════ */
+const STORAGE_KEY='motorun_rides';
+let adminLogged=false, curFilter='week';
 
-function saveRide(data) {
-  const rides = getRides();
-  rides.unshift({ id:Date.now(), ts:new Date().toISOString(), ...data });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(rides));
+function saveRide(r){
+  const rides=getRides();
+  rides.unshift({id:Date.now(),ts:new Date().toISOString(),name:r.name,phone:r.phone,origin:r.origin,dest:r.dest,stops:r.stops,km:r.km,price:r.price,durMin:r.durMin,note:r.note,payment:r.payment,pixPaid:r.pixPaid||false});
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(rides));
 }
-function getRides() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
-}
+function getRides(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch{return[];}}
 
-function openAdmin() {
+function openAdmin(){
   document.getElementById('adminOverlay').classList.add('show');
-  if (adminLogged) { showDash(); return; }
-  document.getElementById('loginBox').style.display = 'block';
-  document.getElementById('dashBox').style.display  = 'none';
-  document.getElementById('adminPass').value = '';
-  document.getElementById('loginErr').style.display = 'none';
-  setTimeout(()=>document.getElementById('adminPass').focus(), 100);
-}
-function closeAdmin() { document.getElementById('adminOverlay').classList.remove('show'); }
-
-function doLogin() {
-  if (document.getElementById('adminPass').value === ADMIN_PASS) {
-    adminLogged=true; showDash();
-  } else {
-    document.getElementById('loginErr').style.display='block';
-    document.getElementById('adminPass').value='';
-  }
-}
-function doLogout() {
-  adminLogged=false;
+  if(adminLogged){showDash();return;}
   document.getElementById('loginBox').style.display='block';
   document.getElementById('dashBox').style.display='none';
+  document.getElementById('adminPass').value='';
+  document.getElementById('loginErr').style.display='none';
+  setTimeout(()=>document.getElementById('adminPass').focus(),100);
+}
+function closeAdmin(){document.getElementById('adminOverlay').classList.remove('show');}
+function doLogin(){
+  if(document.getElementById('adminPass').value===ADMIN_PASS){adminLogged=true;showDash();}
+  else{document.getElementById('loginErr').style.display='block';document.getElementById('adminPass').value='';}
+}
+function doLogout(){adminLogged=false;document.getElementById('loginBox').style.display='block';document.getElementById('dashBox').style.display='none';}
+function setFilter(f,btn){curFilter=f;document.querySelectorAll('.f-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDash();}
+
+function getFiltered(){
+  const all=getRides(),now=new Date();
+  if(curFilter==='all')return all;
+  if(curFilter==='today')return all.filter(r=>new Date(r.ts).toDateString()===now.toDateString());
+  return all.filter(r=>new Date(r.ts)>=new Date(now-7*86400000));
 }
 
-function setFilter(f, btn) {
-  curFilter=f;
-  document.querySelectorAll('.f-pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDash();
-}
-
-function getFiltered() {
-  const all=getRides(), now=new Date();
-  if (curFilter==='all') return all;
-  if (curFilter==='today') return all.filter(r=>new Date(r.ts).toDateString()===now.toDateString());
-  const wa=new Date(now-7*86400000);
-  return all.filter(r=>new Date(r.ts)>=wa);
-}
-
-function showDash() {
+function showDash(){
   document.getElementById('loginBox').style.display='none';
   document.getElementById('dashBox').style.display='flex';
   renderDash();
 }
 
-function renderDash() {
+function renderDash(){
   const rides=getFiltered();
   const total=rides.reduce((s,r)=>s+(r.price||0),0);
-  const km   =rides.reduce((s,r)=>s+(r.km||0),0);
-  const avg  =rides.length?total/rides.length:0;
-  const lbl  ={week:'Últimos 7 dias',today:'Hoje',all:'Todas as corridas'};
-
+  const km=rides.reduce((s,r)=>s+(r.km||0),0);
+  const avg=rides.length?total/rides.length:0;
+  const lbl={week:'Últimos 7 dias',today:'Hoje',all:'Todas'};
   document.getElementById('dashPeriod').textContent=lbl[curFilter];
   document.getElementById('sTotal').textContent='R$ '+total.toFixed(2).replace('.',',');
   document.getElementById('sCount').textContent=rides.length;
@@ -956,41 +1066,127 @@ function renderDash() {
   tbody.innerHTML='';
   document.getElementById('emptyState').style.display=rides.length?'none':'block';
 
-  const PI={'Pix':'⚡','Dinheiro':'💵','Cartão':'💳'};
   rides.forEach(r=>{
     const d=new Date(r.ts);
     const dia=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-    const hr =d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const par=r.stops?` (+${r.stops} parada${r.stops>1?'s':''})`:'';
+    const hr=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const par=r.stops?` +${r.stops}p`:'';
+    const payClass=r.payment==='Pix'?'pix':r.payment==='Dinheiro'?'cash':'card';
+    const payLabel=r.payment+(r.pixPaid?' ✅':'');
+    const pi={Pix:'⚡',Dinheiro:'💵',Cartão:'💳'};
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td><div style="font-weight:600">${r.name||'-'}</div><div style="font-size:11px;color:var(--text3)">${r.phone||''}</div></td>
       <td>
-        <div style="font-size:12px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--green)">A</span> ${r.origin||'-'}</div>
-        <div style="font-size:12px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--red)">B</span> ${r.dest||'-'}${par}</div>
+        <div style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="color:var(--green)">A</span> ${r.origin||'-'}</div>
+        <div style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="color:var(--red)">B</span> ${r.dest||'-'}${par}</div>
       </td>
       <td style="white-space:nowrap;color:var(--text2)"><div>${dia}</div><div style="font-size:11px">${hr}</div></td>
       <td>${(r.km||0).toFixed(1)} km</td>
-      <td>${PI[r.payment]||''} ${r.payment||'-'}</td>
+      <td><span class="pay-badge ${payClass}">${pi[r.payment]||''} ${payLabel}</span></td>
       <td style="white-space:nowrap"><span style="color:var(--accent);font-family:Syne,sans-serif;font-weight:700">R$ ${(r.price||0).toFixed(2)}</span></td>
+      <td>${r.pixPaid?'<span style="color:var(--green);font-size:12px">✅ Pago</span>':'<span style="color:var(--text3);font-size:12px">Pendente</span>'}</td>
       <td><button class="del-btn" onclick="delRide(${r.id})">🗑</button></td>`;
     tbody.appendChild(tr);
   });
 }
 
-function delRide(id) {
-  if (!confirm('Excluir esta corrida?')) return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(getRides().filter(r=>r.id!==id)));
-  renderDash();
-}
-function clearRides() {
-  if (!confirm('Apagar TODAS as corridas?')) return;
-  localStorage.removeItem(STORAGE_KEY); renderDash();
-}
+function delRide(id){if(!confirm('Excluir?'))return;localStorage.setItem(STORAGE_KEY,JSON.stringify(getRides().filter(r=>r.id!==id)));renderDash();}
+function clearRides(){if(!confirm('Apagar TUDO?'))return;localStorage.removeItem(STORAGE_KEY);renderDash();}
 </script>
 
-<!-- Google Maps — callback inicializa os serviços após carregamento completo -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmZRm6Erc2M1bJsuRpOZrlEc9rNyNAs5I&libraries=places&language=pt-BR&region=BR&callback=initGoogleMaps" async defer></script>
+<!-- Google Maps com Places, Geometry e Directions -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmZRm6Erc2M1bJsuRpOZrlEc9rNyNAs5I&libraries=places,geometry&language=pt-BR&region=BR&callback=initGoogleMaps" async defer></script>
+
+<!--
+════════════════════════════════════════════════════════════
+  BACKEND PHP para PagSeguro Pix — salve como api/pix.php
+════════════════════════════════════════════════════════════
+
+<?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+
+$EMAIL   = 'seu@email.com';
+$TOKEN   = 'SEU_TOKEN_PAGSEGURO';
+$SANDBOX = true; // false em produção
+
+$BASE    = $SANDBOX
+  ? 'https://sandbox.api.pagseguro.com'
+  : 'https://api.pagseguro.com';
+
+$action = $_GET['action'] ?? (json_decode(file_get_contents('php://input'), true)['action'] ?? '');
+
+if ($action === 'create_pix') {
+  $body = json_decode(file_get_contents('php://input'), true);
+  $amount = number_format((float)$body['amount'], 2, '.', '');
+  $payload = [
+    'reference_id' => 'MOTO_' . time(),
+    'customer' => [
+      'name'   => $body['customer']['name'],
+      'email'  => 'cliente@email.com',
+      'tax_id' => '00000000000',
+      'phones' => [['country' => '55','area' => '85','number' => '900000000','type' => 'MOBILE']]
+    ],
+    'items' => [[
+      'name'        => $body['description'],
+      'quantity'    => 1,
+      'unit_amount' => (int)($amount * 100)
+    ]],
+    'qr_codes' => [[
+      'amount'             => ['value' => (int)($amount * 100)],
+      'expiration_date'    => date('c', strtotime('+15 minutes'))
+    ]],
+    'notification_urls' => ['https://seusite.com/api/webhook.php']
+  ];
+
+  $ch = curl_init("$BASE/orders");
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST           => true,
+    CURLOPT_POSTFIELDS     => json_encode($payload),
+    CURLOPT_HTTPHEADER     => [
+      'Authorization: Bearer ' . $TOKEN,
+      'Content-Type: application/json',
+      'x-api-version: 4.0'
+    ]
+  ]);
+  $resp = curl_exec($ch);
+  $data = json_decode($resp, true);
+
+  if (isset($data['qr_codes'][0]['text'])) {
+    echo json_encode([
+      'order_id' => $data['id'],
+      'qr_code'  => $data['qr_codes'][0]['text']
+    ]);
+  } else {
+    http_response_code(400);
+    echo json_encode(['error' => 'Falha ao gerar QR Code', 'raw' => $data]);
+  }
+  curl_close($ch); exit;
+}
+
+if ($action === 'check_pix') {
+  $orderId = $_GET['order_id'];
+  $ch = curl_init("$BASE/orders/$orderId");
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $TOKEN, 'x-api-version: 4.0']
+  ]);
+  $data = json_decode(curl_exec($ch), true);
+  curl_close($ch);
+  echo json_encode(['paid' => ($data['charges'][0]['status'] ?? '') === 'PAID']);
+  exit;
+}
+
+http_response_code(400);
+echo json_encode(['error' => 'Ação inválida']);
+?>
+
+════════════════════════════════════════════════════════════ -->
 
 </body>
 </html>
