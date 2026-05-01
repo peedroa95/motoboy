@@ -249,7 +249,7 @@ textarea.f-input { resize:none; height:70px; padding:10px 14px; }
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo"><div class="logo-icon">🏍</div>Moto<span>Entrega</span></div>
+  <div class="logo"><div class="logo-icon">🏍</div>Moto<span>Run</span></div>
   <div class="topbar-right">
     <div class="status-badge"><div class="status-dot"></div>Fortaleza · CE</div>
     <button class="admin-btn" onclick="openAdmin()">⚙ Admin</button>
@@ -543,24 +543,25 @@ function onInput(inp, acId) {
 function doSearch(query, acId, inp) {
   if (!gmReady) { showAC(acId, null, inp); return; }
 
+  // Usa bounds como BIAS (preferência) e componentRestrictions para BR
+  // strictBounds removido pois bloqueava ruas válidas de Fortaleza
   gmAC.getPlacePredictions({
-    input:                 query,
+    input:                 query + ', Fortaleza',
     sessionToken:          gmToken,
     bounds:                gmBounds,
-    strictBounds:          true,          // bloqueia fora do bbox de Fortaleza
     componentRestrictions: { country:'br' },
-    types:                 ['geocode','establishment'],
     language:              'pt-BR'
   }, (preds, status) => {
     if (status !== google.maps.places.PlacesServiceStatus.OK || !preds?.length) {
       showAC(acId, [], inp); return;
     }
-    // Filtro extra: só mostra se texto cita Fortaleza/Ceará
+    // Filtro: só exibe resultados que mencionam Fortaleza ou Ceará
     const filtered = preds.filter(p => {
       const d = p.description.toLowerCase();
-      return d.includes('fortaleza') || d.includes('ceará') || d.includes('ceara');
+      return d.includes('fortaleza') || d.includes('cear');
     });
-    showAC(acId, filtered, inp);
+    // Se o filtro eliminou tudo, mostra os originais (evita "nenhum resultado" falso)
+    showAC(acId, filtered.length ? filtered : preds, inp);
   });
 }
 
@@ -655,18 +656,31 @@ function useGPS() {
     originLL = [lat, lon];
 
     const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location:{ lat, lng:lon }, language:'pt-BR' }, (results, status) => {
+    geocoder.geocode({ location:{ lat, lng:lon }, language:'pt-BR', region:'BR' }, (results, status) => {
       if (status === 'OK' && results[0]) {
         const comps  = results[0].address_components || [];
         const cidade = comps.find(c => c.types.includes('administrative_area_level_2'));
         if (cidade && cidade.long_name !== 'Fortaleza') {
           toast('⚠️ Você está fora de Fortaleza.', 'err');
         }
+        // Monta endereço amigável: rua + número + bairro
         const rua    = comps.find(c => c.types.includes('route'))?.long_name || '';
-        const bairro = comps.find(c => c.types.includes('sublocality') || c.types.includes('neighborhood'))?.long_name || '';
-        document.getElementById('origin').value = rua
-          ? `${rua}${bairro ? ' — '+bairro : ''}`
-          : results[0].formatted_address.split(',')[0];
+        const num    = comps.find(c => c.types.includes('street_number'))?.long_name || '';
+        const bairro = comps.find(c =>
+          c.types.includes('sublocality_level_1') ||
+          c.types.includes('sublocality') ||
+          c.types.includes('neighborhood') ||
+          c.types.includes('political')
+        )?.long_name || '';
+        // Prioridade: rua → formatted_address → coordenadas
+        if (rua) {
+          document.getElementById('origin').value = `${rua}${num ? ', '+num : ''}${bairro ? ' — '+bairro : ''}`;
+        } else if (results[0].formatted_address) {
+          // Pega apenas as 2 primeiras partes do endereço formatado
+          document.getElementById('origin').value = results[0].formatted_address.split(',').slice(0,2).join(',').trim();
+        } else {
+          document.getElementById('origin').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        }
       } else {
         document.getElementById('origin').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
       }
