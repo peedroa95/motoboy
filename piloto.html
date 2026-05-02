@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotoRun — Painel do Piloto</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0d0d; --surface:#141414; --surface2:#1c1c1c; --border:#2a2a2a;
+  --accent:#f97316; --accent2:#fb923c;
+  --green:#22c55e; --green2:#16a34a;
+  --red:#ef4444; --red2:#dc2626;
+  --yellow:#eab308; --yellow2:#ca8a04;
+  --blue:#60a5fa; --blue2:#3b82f6;
+  --purple:#a78bfa;
+  --text:#f5f5f5; --text2:#a3a3a3; --text3:#525252;
+  --r:14px; --rs:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+
+/* ── LOGIN ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(249,115,22,.12) 0%,transparent 70%);}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px 40px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5);}
+.login-logo{width:64px;height:64px;background:var(--accent);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px;}
+.login-card h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px;}
+.login-card p{color:var(--text3);font-size:14px;margin-bottom:32px;}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:14px 16px;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.login-input:focus{border-color:var(--accent);}
+.login-input::placeholder{color:var(--text3);}
+.login-btn{width:100%;padding:15px;background:var(--accent);border:none;border-radius:var(--rs);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.login-btn:hover{background:var(--accent2);transform:translateY(-1px);}
+.login-err{color:var(--red);font-size:13px;margin-top:10px;display:none;}
+
+/* ── APP ── */
+.app{display:none;flex-direction:column;min-height:100vh;}
+.app.show{display:flex;}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:60px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo span{color:var(--accent);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.online-toggle{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:6px 14px;cursor:pointer;transition:all .2s;font-size:13px;font-weight:500;}
+.online-toggle.online{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08);color:var(--green);}
+.online-toggle.offline{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:var(--red);}
+.tog-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.online-toggle.online  .tog-dot{background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.6);}
+.online-toggle.offline .tog-dot{background:var(--red);}
+.logout-btn{background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── STATS BAR ── */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.stat-item{background:var(--surface);padding:14px 20px;text-align:center;}
+.stat-item .sl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:'Syne',sans-serif;margin-bottom:4px;}
+.stat-item .sv{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.sv.ac{color:var(--accent);} .sv.gr{color:var(--green);} .sv.yl{color:var(--yellow);} .sv.bl{color:var(--blue);}
+
+/* ── FILTER TABS ── */
+.filter-tabs{display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto;}
+.tab{padding:14px 18px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-count{background:var(--surface2);border-radius:100px;padding:2px 8px;font-size:11px;font-weight:700;}
+.tab.active .tab-count{background:rgba(249,115,22,.2);color:var(--accent);}
+
+/* ── MAIN ── */
+.main{flex:1;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:80px 20px;color:var(--text3);}
+.empty-icon{font-size:64px;margin-bottom:16px;display:block;}
+.empty h3{font-family:'Syne',sans-serif;font-size:18px;color:var(--text2);margin-bottom:8px;}
+.empty p{font-size:14px;line-height:1.6;}
+
+/* ── RIDE CARD ── */
+.ride-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+.ride-card:hover{border-color:#3a3a3a;box-shadow:0 4px 24px rgba(0,0,0,.3);}
+.ride-card.pending  {border-left:3px solid var(--yellow);}
+.ride-card.accepted {border-left:3px solid var(--blue);}
+.ride-card.ongoing  {border-left:3px solid var(--accent);}
+.ride-card.done     {border-left:3px solid var(--green);}
+.ride-card.refused  {border-left:3px solid var(--red);opacity:.55;}
+
+/* card header */
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 0;}
+.card-head-left{display:flex;align-items:center;gap:12px;}
+.client-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;flex-shrink:0;}
+.client-name{font-weight:600;font-size:15px;}
+.client-phone{font-size:12px;color:var(--text3);margin-top:2px;}
+.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.sp-pending  {background:rgba(234,179,8,.12); color:var(--yellow);}
+.sp-accepted {background:rgba(96,165,250,.12); color:var(--blue);}
+.sp-ongoing  {background:rgba(249,115,22,.12); color:var(--accent);}
+.sp-done     {background:rgba(34,197,94,.12);  color:var(--green);}
+.sp-refused  {background:rgba(239,68,68,.12);  color:var(--red);}
+
+/* route info */
+.card-route{padding:14px 18px;display:flex;flex-direction:column;gap:6px;}
+.route-point{display:flex;align-items:flex-start;gap:10px;font-size:13px;}
+.rp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.rp-dot.a{background:var(--green);}
+.rp-dot.b{background:var(--red);}
+.rp-dot.s{background:var(--yellow);}
+.rp-line{width:2px;height:16px;background:var(--border);margin-left:4px;margin-top:2px;}
+.rp-addr{color:var(--text2);line-height:1.4;flex:1;}
+.rp-addr strong{color:var(--text);display:block;margin-bottom:1px;}
+
+/* card metrics */
+.card-metrics{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.metric{flex:1;padding:10px 14px;text-align:center;border-right:1px solid var(--border);}
+.metric:last-child{border-right:none;}
+.metric .ml{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.metric .mv{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+
+/* pay badge */
+.pay-info{display:flex;align-items:center;gap:8px;padding:10px 18px;}
+.pay-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:600;}
+.pb-pix  {background:rgba(34,197,94,.1); color:var(--green); border:1px solid rgba(34,197,94,.2);}
+.pb-cash {background:rgba(234,179,8,.1); color:var(--yellow);border:1px solid rgba(234,179,8,.2);}
+.pb-card {background:rgba(96,165,250,.1);color:var(--blue);  border:1px solid rgba(96,165,250,.2);}
+.pb-paid {background:rgba(34,197,94,.2); color:var(--green); border:1px solid rgba(34,197,94,.4);}
+.ride-time{font-size:12px;color:var(--text3);margin-left:auto;}
+.ride-note{font-size:12px;color:var(--text3);padding:0 18px 10px;font-style:italic;}
+
+/* action buttons */
+.card-actions{display:flex;gap:10px;padding:14px 18px;}
+.act-btn{flex:1;padding:11px;border:none;border-radius:var(--rs);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.act-btn:hover{transform:translateY(-1px);}
+.act-btn:active{transform:translateY(0);}
+.btn-accept  {background:rgba(96,165,250,.15); color:var(--blue);   border:1px solid rgba(96,165,250,.3);}
+.btn-accept:hover  {background:var(--blue);   color:#000;}
+.btn-refuse  {background:rgba(239,68,68,.1);  color:var(--red);    border:1px solid rgba(239,68,68,.25);}
+.btn-refuse:hover  {background:var(--red);    color:#fff;}
+.btn-start   {background:rgba(249,115,22,.15);color:var(--accent); border:1px solid rgba(249,115,22,.3);}
+.btn-start:hover   {background:var(--accent); color:#fff;}
+.btn-done    {background:rgba(34,197,94,.15); color:var(--green);  border:1px solid rgba(34,197,94,.3);}
+.btn-done:hover    {background:var(--green);  color:#000;}
+.btn-wpp     {background:rgba(34,197,94,.1);  color:var(--green);  border:1px solid rgba(34,197,94,.2);}
+.btn-wpp:hover     {background:var(--green);  color:#000;}
+.btn-map     {background:rgba(96,165,250,.1); color:var(--blue);   border:1px solid rgba(96,165,250,.2);}
+.btn-map:hover     {background:var(--blue);   color:#000;}
+
+/* ── NEW RIDE ALERT ── */
+.new-alert{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--surface);border:1px solid rgba(249,115,22,.5);border-radius:100px;padding:12px 24px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;z-index:500;box-shadow:0 8px 32px rgba(249,115,22,.2);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;}
+.new-alert.show{transform:translateX(-50%) translateY(0);}
+.alert-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:blink .8s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── PULL REFRESH ── */
+.refresh-btn{width:100%;padding:12px;background:transparent;border:1px dashed var(--border);border-radius:var(--rs);color:var(--text3);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-bottom:16px;}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+.spinning{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CONFIRM MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.overlay.show{display:flex;}
+.confirm-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:360px;width:90%;text-align:center;}
+.confirm-modal h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;}
+.confirm-modal p{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:24px;}
+.confirm-btns{display:flex;gap:10px;}
+.cbtn{flex:1;padding:13px;border:none;border-radius:var(--rs);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
+.cbtn-cancel{background:var(--surface2);color:var(--text2);}
+.cbtn-cancel:hover{background:var(--border);}
+.cbtn-confirm{background:var(--accent);color:#fff;}
+.cbtn-confirm:hover{background:var(--accent2);}
+.cbtn-red{background:var(--red);color:#fff;}
+.cbtn-red:hover{background:var(--red2);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:12px 20px;font-size:13px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:rgba(34,197,94,.4);}
+.toast.err{border-color:rgba(239,68,68,.4);}
+
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+@media(max-width:600px){
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .card-actions{flex-wrap:wrap;}
+  .act-btn{flex:none;width:calc(50% - 5px);}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">🏍</div>
+    <h1>Moto<span style="color:var(--accent)">Run</span></h1>
+    <p>Painel exclusivo do piloto</p>
+    <input class="login-input" type="password" id="pilotPass" placeholder="Senha do piloto" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Entrar no Painel</button>
+    <div class="login-err" id="loginErr">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">🏍</div>
+      Moto<span>Run</span>
+      <span style="font-size:11px;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400;margin-left:4px">· Piloto</span>
+    </div>
+    <div class="topbar-right">
+      <div class="online-toggle online" id="onlineToggle" onclick="toggleOnline()">
+        <div class="tog-dot"></div>
+        <span id="onlineLabel">Online</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item"><div class="sl">Hoje</div><div class="sv ac" id="statHoje">R$ 0</div></div>
+    <div class="stat-item"><div class="sl">Corridas</div><div class="sv bl" id="statCorridas">0</div></div>
+    <div class="stat-item"><div class="sl">Km hoje</div><div class="sv yl" id="statKm">0 km</div></div>
+    <div class="stat-item"><div class="sl">Pendentes</div><div class="sv gr" id="statPendentes">0</div></div>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-tabs">
+    <div class="tab active" onclick="setTab('pending',this)">🟡 Pendentes <span class="tab-count" id="cnt-pending">0</span></div>
+    <div class="tab" onclick="setTab('accepted',this)">🔵 Aceitas <span class="tab-count" id="cnt-accepted">0</span></div>
+    <div class="tab" onclick="setTab('ongoing',this)">🟠 Em Andamento <span class="tab-count" id="cnt-ongoing">0</span></div>
+    <div class="tab" onclick="setTab('done',this)">🟢 Concluídas <span class="tab-count" id="cnt-done">0</span></div>
+    <div class="tab" onclick="setTab('refused',this)">🔴 Recusadas <span class="tab-count" id="cnt-refused">0</span></div>
+    <div class="tab" onclick="setTab('all',this)">📋 Todas <span class="tab-count" id="cnt-all">0</span></div>
+  </div>
+
+  <!-- RIDES LIST -->
+  <div class="main" id="mainContent">
+    <button class="refresh-btn" onclick="refreshRides()" id="refreshBtn">
+      <span id="refreshIcon">🔄</span> Atualizar corridas
+    </button>
+    <div id="ridesList"></div>
+  </div>
+
+</div>
+
+<!-- NEW RIDE ALERT -->
+<div class="new-alert" id="newAlert">
+  <div class="alert-dot"></div>
+  <span id="newAlertMsg">Nova corrida solicitada!</span>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="overlay" id="confirmOverlay">
+  <div class="confirm-modal">
+    <h3 id="confirmTitle">Confirmar</h3>
+    <p id="confirmMsg">Tem certeza?</p>
+    <div class="confirm-btns">
+      <button class="cbtn cbtn-cancel" onclick="closeConfirm()">Cancelar</button>
+      <button class="cbtn cbtn-confirm" id="confirmBtn" onclick="runConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════
+   ⚙️  CONFIGURAÇÃO
+════════════════════════════════════════════════════════ */
+const PILOT_PASS   = 'piloto2024';      // ← senha do painel do piloto
+const WHATSAPP     = '5585999888735';   // ← seu número com DDI
+const STORAGE_KEY  = 'motorun_rides';   // deve ser igual ao motoboy-app.html
+
+/* ════════════════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════════════════ */
+function doLogin() {
+  const v = document.getElementById('pilotPass').value;
+  if (v === PILOT_PASS) {
+    sessionStorage.setItem('pilot_auth', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('pilotPass').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('pilot_auth');
+  location.reload();
+}
+
+// Auto-login se já autenticado
+if (sessionStorage.getItem('pilot_auth') === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  window.addEventListener('DOMContentLoaded', initApp);
+}
+document.getElementById('pilotPass')?.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+/* ════════════════════════════════════════════════════════
+   ONLINE/OFFLINE
+════════════════════════════════════════════════════════ */
+let isOnline = true;
+function toggleOnline() {
+  isOnline = !isOnline;
+  const el  = document.getElementById('onlineToggle');
+  const lbl = document.getElementById('onlineLabel');
+  el.className  = `online-toggle ${isOnline?'online':'offline'}`;
+  lbl.textContent = isOnline ? 'Online' : 'Offline';
+  toast(isOnline ? '✅ Você está online!' : '⛔ Você está offline', isOnline?'ok':'err');
+}
+
+/* ════════════════════════════════════════════════════════
+   ESTADO
+════════════════════════════════════════════════════════ */
+let curTab       = 'pending';
+let confirmCb    = null;
+let lastKnownIds = new Set();
+let pollInterval = null;
+
+/* ════════════════════════════════════════════════════════
+   STORAGE
+════════════════════════════════════════════════════════ */
+function getRides() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+}
+
+function saveRides(rides) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(rides));
+}
+
+function updateRideStatus(id, status) {
+  const rides = getRides();
+  const idx   = rides.findIndex(r => r.id === id);
+  if (idx === -1) return;
+  rides[idx].status    = status;
+  rides[idx].updatedAt = new Date().toISOString();
+  if (status === 'ongoing')  rides[idx].startedAt  = new Date().toISOString();
+  if (status === 'done')     rides[idx].finishedAt = new Date().toISOString();
+  saveRides(rides);
+  render();
+}
+
+/* ════════════════════════════════════════════════════════
+   APP INIT
+════════════════════════════════════════════════════════ */
+function initApp() {
+  render();
+  // Poll a cada 10s para novas corridas
+  pollInterval = setInterval(checkNewRides, 10000);
+  // Inicializa set de IDs conhecidos
+  getRides().forEach(r => lastKnownIds.add(r.id));
+}
+
+function checkNewRides() {
+  const rides   = getRides();
+  const newOnes = rides.filter(r => !lastKnownIds.has(r.id));
+  newOnes.forEach(r => lastKnownIds.add(r.id));
+  if (newOnes.length > 0) {
+    showNewAlert(`${newOnes.length} nova${newOnes.length>1?'s':''} corrida${newOnes.length>1?'s':''} solicitada${newOnes.length>1?'s':''}!`);
+    try { new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAA==').play(); } catch(e){}
+    render();
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════ */
+function setTab(tab, el) {
+  curTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+/* ════════════════════════════════════════════════════════
+   REFRESH
+════════════════════════════════════════════════════════ */
+function refreshRides() {
+  const icon = document.getElementById('refreshIcon');
+  icon.classList.add('spinning');
+  setTimeout(() => {
+    checkNewRides();
+    render();
+    icon.classList.remove('spinning');
+    toast('Corridas atualizadas!', 'ok');
+  }, 800);
+}
+
+/* ════════════════════════════════════════════════════════
+   RENDER
+════════════════════════════════════════════════════════ */
+function render() {
+  const all    = getRides();
+  const counts = { pending:0, accepted:0, ongoing:0, done:0, refused:0, all:all.length };
+
+  all.forEach(r => {
+    const s = r.status || 'pending';
+    if (counts[s] !== undefined) counts[s]++;
+  });
+
+  // Update tab counts
+  Object.keys(counts).forEach(k => {
+    const el = document.getElementById(`cnt-${k}`);
+    if (el) el.textContent = counts[k];
+  });
+
+  // Update stats
+  const today     = new Date().toDateString();
+  const todayRides= all.filter(r => new Date(r.ts).toDateString() === today);
+  const doneToday = todayRides.filter(r => r.status === 'done');
+
+  document.getElementById('statHoje').textContent     = 'R$ ' + doneToday.reduce((s,r)=>s+(r.price||0),0).toFixed(2);
+  document.getElementById('statCorridas').textContent = doneToday.length;
+  document.getElementById('statKm').textContent       = doneToday.reduce((s,r)=>s+(r.km||0),0).toFixed(1) + ' km';
+  document.getElementById('statPendentes').textContent= counts.pending;
+
+  // Filter rides
+  const filtered = curTab === 'all'
+    ? all
+    : all.filter(r => (r.status || 'pending') === curTab);
+
+  const list = document.getElementById('ridesList');
+  list.innerHTML = '';
+
+  if (!filtered.length) {
+    const emptyMsgs = {
+      pending:  { icon:'🟡', title:'Nenhuma corrida pendente', sub:'Quando um cliente solicitar, aparecerá aqui.' },
+      accepted: { icon:'🔵', title:'Nenhuma corrida aceita', sub:'Aceite uma corrida pendente para aparecer aqui.' },
+      ongoing:  { icon:'🟠', title:'Nenhuma corrida em andamento', sub:'Inicie uma corrida aceita.' },
+      done:     { icon:'🟢', title:'Nenhuma corrida concluída hoje', sub:'As corridas finalizadas aparecem aqui.' },
+      refused:  { icon:'🔴', title:'Nenhuma corrida recusada', sub:'' },
+      all:      { icon:'📋', title:'Nenhuma corrida ainda', sub:'As solicitações dos clientes aparecerão aqui.' },
+    };
+    const m = emptyMsgs[curTab] || emptyMsgs.all;
+    list.innerHTML = `<div class="empty"><span class="empty-icon">${m.icon}</span><h3>${m.title}</h3><p>${m.sub}</p></div>`;
+    return;
+  }
+
+  filtered.forEach(ride => list.appendChild(buildCard(ride)));
+}
+
+/* ════════════════════════════════════════════════════════
+   BUILD CARD
+════════════════════════════════════════════════════════ */
+function buildCard(ride) {
+  const status  = ride.status || 'pending';
+  const card    = document.createElement('div');
+  card.className = `ride-card ${status}`;
+  card.id = `card-${ride.id}`;
+
+  const d   = new Date(ride.ts);
+  const dia = d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+  const hr  = d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+
+  const statusInfo = {
+    pending:  { label:'Aguardando',    cls:'sp-pending',  icon:'⏳' },
+    accepted: { label:'Aceita',        cls:'sp-accepted', icon:'✅' },
+    ongoing:  { label:'Em Andamento',  cls:'sp-ongoing',  icon:'🏍️' },
+    done:     { label:'Concluída',     cls:'sp-done',     icon:'🏁' },
+    refused:  { label:'Recusada',      cls:'sp-refused',  icon:'❌' },
+  };
+  const si = statusInfo[status] || statusInfo.pending;
+
+  const initials = (ride.name || 'C').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const avatarColors = ['#f97316','#22c55e','#60a5fa','#a78bfa','#eab308','#ef4444'];
+  const avatarBg = avatarColors[ride.id % avatarColors.length];
+
+  const payBadgeCls = ride.pixPaid ? 'pb-paid' : (ride.payment==='Pix'?'pb-pix':ride.payment==='Dinheiro'?'pb-cash':'pb-card');
+  const payIcon = {Pix:'⚡',Dinheiro:'💵','Cartão':'💳'}[ride.payment] || '💳';
+  const payLabel = ride.pixPaid ? `${payIcon} Pix ✅ Pago` : `${payIcon} ${ride.payment}`;
+
+  const stopLines = ride.stops
+    ? `<div class="rp-line"></div><div class="route-point"><div class="rp-dot s"></div><div class="rp-addr"><strong>${ride.stops} parada${ride.stops>1?'s':''}</strong></div></div>`
+    : '';
+
+  // Duração corrida em andamento
+  let ongoingTime = '';
+  if (status === 'ongoing' && ride.startedAt) {
+    const elapsed = Math.round((Date.now() - new Date(ride.startedAt)) / 60000);
+    ongoingTime = `<div style="font-size:12px;color:var(--accent);padding:0 18px 8px;font-weight:600">🏍️ Em andamento há ${elapsed} min</div>`;
+  }
+
+  let finishedTime = '';
+  if (status === 'done' && ride.finishedAt) {
+    const mins = Math.round((new Date(ride.finishedAt) - new Date(ride.startedAt||ride.ts)) / 60000);
+    finishedTime = `<div style="font-size:12px;color:var(--green);padding:0 18px 8px">✅ Concluída em ${mins} min</div>`;
+  }
+
+  card.innerHTML = `
+    <!-- HEAD -->
+    <div class="card-head">
+      <div class="card-head-left">
+        <div class="client-avatar" style="background:${avatarBg}20;color:${avatarBg};border:1.5px solid ${avatarBg}40">${initials}</div>
+        <div>
+          <div class="client-name">${ride.name || 'Cliente'}</div>
+          <div class="client-phone">${ride.phone || ''}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-size:11px;color:var(--text3)">${dia} ${hr}</div>
+        <div class="status-pill ${si.cls}">${si.icon} ${si.label}</div>
+      </div>
+    </div>
+
+    <!-- ROTA -->
+    <div class="card-route">
+      <div class="route-point">
+        <div class="rp-dot a"></div>
+        <div class="rp-addr"><strong>Partida</strong>${ride.origin || '-'}</div>
+      </div>
+      ${stopLines}
+      <div class="rp-line"></div>
+      <div class="route-point">
+        <div class="rp-dot b"></div>
+        <div class="rp-addr"><strong>Destino</strong>${ride.dest || '-'}</div>
+      </div>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="card-metrics">
+      <div class="metric"><div class="ml">Distância</div><div class="mv">${(ride.km||0).toFixed(1)} km</div></div>
+      <div class="metric"><div class="ml">Tempo est.</div><div class="mv">${ride.durMin||'—'} min</div></div>
+      <div class="metric"><div class="ml">Valor</div><div class="mv" style="color:var(--accent)">R$ ${(ride.price||0).toFixed(2)}</div></div>
+    </div>
+
+    <!-- PAG + HORA -->
+    <div class="pay-info">
+      <span class="pay-badge ${payBadgeCls}">${payLabel}</span>
+      <span class="ride-time">${dia} às ${hr}</span>
+    </div>
+
+    ${ride.note ? `<div class="ride-note">📝 ${ride.note}</div>` : ''}
+    ${ongoingTime}
+    ${finishedTime}
+
+    <!-- AÇÕES -->
+    <div class="card-actions" id="actions-${ride.id}">
+      ${buildActions(ride)}
+    </div>
+  `;
+
+  return card;
+}
+
+function buildActions(ride) {
+  const status = ride.status || 'pending';
+  const id     = ride.id;
+
+  if (status === 'pending') return `
+    <button class="act-btn btn-accept" onclick="acceptRide(${id})">✅ Aceitar</button>
+    <button class="act-btn btn-refuse" onclick="refuseRide(${id})">❌ Recusar</button>
+    <button class="act-btn btn-wpp"    onclick="callClient('${ride.phone}','${ride.name}')">📲 WhatsApp</button>
+    <button class="act-btn btn-map"    onclick="openMap('${encodeURIComponent(ride.origin)}','${encodeURIComponent(ride.dest)}')">🗺️ Rota</button>
+  `;
+
+  if (status === 'accepted') return `
+    <button class="act-btn btn-start"  onclick="startRide(${id})">🏍️ Iniciar Corrida</button>
+    <button class="act-btn btn-refuse" onclick="refuseRide(${id})">❌ Cancelar</button>
+    <button class="act-btn btn-wpp"    onclick="callClient('${ride.phone}','${ride.name}')">📲 WhatsApp</button>
+    <button class="act-btn btn-map"    onclick="openMap('${encodeURIComponent(ride.origin)}','${encodeURIComponent(ride.dest)}')">🗺️ Rota</button>
+  `;
+
+  if (status === 'ongoing') return `
+    <button class="act-btn btn-done"   onclick="doneRide(${id})" style="flex:2">🏁 Concluir Corrida</button>
+    <button class="act-btn btn-wpp"    onclick="callClient('${ride.phone}','${ride.name}')">📲 WhatsApp</button>
+    <button class="act-btn btn-map"    onclick="openMap('${encodeURIComponent(ride.origin)}','${encodeURIComponent(ride.dest)}')">🗺️ Rota</button>
+  `;
+
+  if (status === 'done') return `
+    <button class="act-btn btn-wpp"  onclick="callClient('${ride.phone}','${ride.name}')">📲 WhatsApp</button>
+    <button class="act-btn btn-map"  onclick="openMap('${encodeURIComponent(ride.origin)}','${encodeURIComponent(ride.dest)}')">🗺️ Ver Rota</button>
+  `;
+
+  if (status === 'refused') return `
+    <button class="act-btn btn-accept" onclick="acceptRide(${id})">↩️ Reativar</button>
+  `;
+
+  return '';
+}
+
+/* ════════════════════════════════════════════════════════
+   AÇÕES
+════════════════════════════════════════════════════════ */
+function acceptRide(id) {
+  confirm2(
+    '✅ Aceitar Corrida',
+    'Deseja aceitar esta corrida? O cliente será notificado.',
+    'Aceitar', 'var(--blue)',
+    () => {
+      updateRideStatus(id, 'accepted');
+      // Notifica cliente via WhatsApp
+      const ride = getRides().find(r => r.id === id);
+      if (ride) {
+        const msg = `✅ *MotoRun — Corrida Aceita!*\n\nOlá ${ride.name}! Sua corrida foi aceita.\nO motoboy está a caminho do ponto de partida.\n\n📍 *Partida:* ${ride.origin}\n🏁 *Destino:* ${ride.dest}\n💰 *Valor:* R$ ${ride.price.toFixed(2)}`;
+        window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURI(msg), '_blank');
+      }
+      toast('✅ Corrida aceita! Cliente notificado.', 'ok');
+    }
+  );
+}
+
+function refuseRide(id) {
+  confirm2(
+    '❌ Recusar Corrida',
+    'Tem certeza que deseja recusar esta corrida?',
+    'Recusar', 'var(--red)',
+    () => { updateRideStatus(id, 'refused'); toast('Corrida recusada.', 'err'); }
+  );
+}
+
+function startRide(id) {
+  confirm2(
+    '🏍️ Iniciar Corrida',
+    'Confirmar que você está a caminho? O cronômetro iniciará agora.',
+    'Iniciar', 'var(--accent)',
+    () => { updateRideStatus(id, 'ongoing'); toast('🏍️ Corrida iniciada!', 'ok'); }
+  );
+}
+
+function doneRide(id) {
+  confirm2(
+    '🏁 Concluir Corrida',
+    'Corrida finalizada? Confirme para registrar como concluída.',
+    'Concluir', 'var(--green)',
+    () => {
+      updateRideStatus(id, 'done');
+      const ride = getRides().find(r => r.id === id);
+      if (ride) {
+        const msg = `🏁 *MotoRun — Corrida Concluída!*\n\nObrigado ${ride.name}! Sua corrida foi finalizada com sucesso.\n\n💰 *Valor:* R$ ${ride.price.toFixed(2)}\n\nVolte a usar o MotoRun! 🏍️`;
+        setTimeout(() => window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURI(msg), '_blank'), 300);
+      }
+      toast('🏁 Corrida concluída!', 'ok');
+    }
+  );
+}
+
+function callClient(phone, name) {
+  const clean = phone.replace(/\D/g,'');
+  const num   = clean.startsWith('55') ? clean : '55' + clean;
+  const msg   = `Olá ${name}, sou o motoboy do MotoRun! 🏍️`;
+  window.open('https://wa.me/' + num + '?text=' + encodeURI(msg), '_blank');
+}
+
+function openMap(origin, dest) {
+  const o = decodeURIComponent(origin);
+  const d = decodeURIComponent(dest);
+  const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(o+', Fortaleza, CE')}&destination=${encodeURIComponent(d+', Fortaleza, CE')}&travelmode=driving`;
+  window.open(url, '_blank');
+}
+
+/* ════════════════════════════════════════════════════════
+   CONFIRM MODAL
+════════════════════════════════════════════════════════ */
+function confirm2(title, msg, btnLabel, btnColor, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent   = msg;
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent       = btnLabel;
+  btn.style.background  = btnColor;
+  confirmCb = cb;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); confirmCb=null; }
+function runConfirm()   { closeConfirm(); if(confirmCb) confirmCb(); }
+
+/* ════════════════════════════════════════════════════════
+   NEW ALERT
+════════════════════════════════════════════════════════ */
+let alertTimer;
+function showNewAlert(msg) {
+  const el = document.getElementById('newAlert');
+  document.getElementById('newAlertMsg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(alertTimer);
+  alertTimer = setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+/* ════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════ */
+let toastT;
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast ${type} show`;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
