@@ -589,59 +589,43 @@ function buildActions(ride) {
 }
 
 /* ════════════════════════════════════════════════════════
-   AÇÕES
+   AÇÕES — diretas, sem modal intermediário
 ════════════════════════════════════════════════════════ */
+function notifyClient(ride, msg) {
+  const clean = (ride.phone || '').replace(/\D/g, '');
+  const num   = clean.startsWith('55') ? clean : '55' + clean;
+  if (num.length >= 12) window.open('https://wa.me/' + num + '?text=' + encodeURI(msg), '_blank');
+}
+
 function acceptRide(id) {
-  confirm2(
-    '✅ Aceitar Corrida',
-    'Deseja aceitar esta corrida? O cliente será notificado.',
-    'Aceitar', 'var(--blue)',
-    () => {
-      updateRideStatus(id, 'accepted');
-      // Notifica cliente via WhatsApp
-      const ride = getRides().find(r => r.id === id);
-      if (ride) {
-        const msg = `✅ *MotoRun — Corrida Aceita!*\n\nOlá ${ride.name}! Sua corrida foi aceita.\nO motoboy está a caminho do ponto de partida.\n\n📍 *Partida:* ${ride.origin}\n🏁 *Destino:* ${ride.dest}\n💰 *Valor:* R$ ${ride.price.toFixed(2)}`;
-        window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURI(msg), '_blank');
-      }
-      toast('✅ Corrida aceita! Cliente notificado.', 'ok');
-    }
-  );
+  updateRideStatus(id, 'accepted');
+  const ride = getRides().find(r => r.id === id);
+  if (ride) {
+    const msg = '✅ *MotoRun — Corrida Aceita!*\n\nOlá ' + ride.name + '! Sua corrida foi aceita.\nO motoboy está a caminho.\n\n📍 *Partida:* ' + ride.origin + '\n🏁 *Destino:* ' + ride.dest + '\n💰 *Valor:* R$ ' + (ride.price||0).toFixed(2);
+    notifyClient(ride, msg);
+  }
+  toast('✅ Corrida aceita!', 'ok');
 }
 
 function refuseRide(id) {
-  confirm2(
-    '❌ Recusar Corrida',
-    'Tem certeza que deseja recusar esta corrida?',
-    'Recusar', 'var(--red)',
-    () => { updateRideStatus(id, 'refused'); toast('Corrida recusada.', 'err'); }
-  );
+  if (!window.confirm('Recusar esta corrida?')) return;
+  updateRideStatus(id, 'refused');
+  toast('Corrida recusada.', 'err');
 }
 
 function startRide(id) {
-  confirm2(
-    '🏍️ Iniciar Corrida',
-    'Confirmar que você está a caminho? O cronômetro iniciará agora.',
-    'Iniciar', 'var(--accent)',
-    () => { updateRideStatus(id, 'ongoing'); toast('🏍️ Corrida iniciada!', 'ok'); }
-  );
+  updateRideStatus(id, 'ongoing');
+  toast('🏍️ Corrida iniciada! Bom trabalho!', 'ok');
 }
 
 function doneRide(id) {
-  confirm2(
-    '🏁 Concluir Corrida',
-    'Corrida finalizada? Confirme para registrar como concluída.',
-    'Concluir', 'var(--green)',
-    () => {
-      updateRideStatus(id, 'done');
-      const ride = getRides().find(r => r.id === id);
-      if (ride) {
-        const msg = `🏁 *MotoRun — Corrida Concluída!*\n\nObrigado ${ride.name}! Sua corrida foi finalizada com sucesso.\n\n💰 *Valor:* R$ ${ride.price.toFixed(2)}\n\nVolte a usar o MotoRun! 🏍️`;
-        setTimeout(() => window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURI(msg), '_blank'), 300);
-      }
-      toast('🏁 Corrida concluída!', 'ok');
-    }
-  );
+  updateRideStatus(id, 'done');
+  const ride = getRides().find(r => r.id === id);
+  if (ride) {
+    const msg = '🏁 *MotoRun — Corrida Concluída!*\n\nObrigado ' + ride.name + '! Entrega realizada com sucesso.\n\n💰 *Valor:* R$ ' + (ride.price||0).toFixed(2) + '\n\nUse MotoRun sempre! 🏍️';
+    setTimeout(() => notifyClient(ride, msg), 400);
+  }
+  toast('🏁 Corrida concluída!', 'ok');
 }
 
 function callClient(phone, name) {
@@ -665,13 +649,21 @@ function confirm2(title, msg, btnLabel, btnColor, cb) {
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmMsg').textContent   = msg;
   const btn = document.getElementById('confirmBtn');
-  btn.textContent       = btnLabel;
-  btn.style.background  = btnColor;
+  btn.textContent      = btnLabel;
+  btn.style.background = btnColor;
+  btn.style.color      = '#fff';
   confirmCb = cb;
   document.getElementById('confirmOverlay').classList.add('show');
 }
-function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); confirmCb=null; }
-function runConfirm()   { closeConfirm(); if(confirmCb) confirmCb(); }
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  confirmCb = null;
+}
+function runConfirm() {
+  const cb = confirmCb;
+  closeConfirm();
+  if (cb) cb();
+}
 
 /* ════════════════════════════════════════════════════════
    NEW ALERT
