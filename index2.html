@@ -409,7 +409,7 @@ textarea.f-input{resize:none;height:70px;padding:10px 14px;}
 ════════════════════════════════════════════════════════ */
 const WHATSAPP   = '5585999888735';   // seu número com DDI
 const PRECO_MIN  = 10.00;
-const FATOR_KM   = 2;
+const FATOR_KM   = 1.60;
 const KM_BASE    = 5;
 const ADMIN_PASS = 'motorun2024';
 
@@ -965,7 +965,10 @@ function finishWithWhatsApp(ride) {
     `💳 *Pagamento:* ${PI[ride.payment]||''} ${ride.payment}${ride.pixPaid?' ✅ PAGO':''}`,
     ...(ride.note?[`📝 *Obs:* ${ride.note}`]:[])
   ];
-  setTimeout(()=>window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`,'_blank'),500);
+  // Usa encodeURI (não encodeURIComponent) para preservar emojis no WhatsApp
+  const msg = lines.join('\n');
+  const waUrl = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURI(msg).replace(/#/g,'%23').replace(/&/g,'%26');
+  setTimeout(()=>window.open(waUrl,'_blank'),500);
   saveRide(ride);
   if (ride.payment !== 'Pix') showSuccessModal(ride);
 }
