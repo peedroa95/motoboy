@@ -205,6 +205,67 @@ textarea.f-input{resize:none;height:70px;padding:10px 14px;}
   .dashboard{width:100vw;max-height:100vh;border-radius:0;}
   .rides-tbl th:nth-child(3),.rides-tbl td:nth-child(3){display:none;}
 }
+
+/* ── PILOTO PANEL ── */
+.ptab{padding:13px 16px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.ptab:hover{color:var(--text);}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.ptab-cnt{background:var(--surface2);border-radius:100px;padding:2px 7px;font-size:10px;font-weight:700;}
+.ptab.active .ptab-cnt{background:rgba(249,115,22,.2);color:var(--accent);}
+
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:border-color .2s;}
+.pcard.pending {border-left:3px solid var(--yellow);}
+.pcard.accepted{border-left:3px solid var(--blue);}
+.pcard.ongoing {border-left:3px solid var(--accent);box-shadow:0 0 20px rgba(249,115,22,.1);}
+.pcard.done    {border-left:3px solid var(--green);}
+.pcard.refused {border-left:3px solid var(--red);opacity:.5;}
+
+.pcard-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;}
+.pclient-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;flex-shrink:0;}
+.pclient-name{font-weight:600;font-size:14px;}
+.pclient-phone{font-size:12px;color:var(--text3);}
+.pstatus-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.psp-pending {background:rgba(234,179,8,.12);color:var(--yellow);}
+.psp-accepted{background:rgba(96,165,250,.12);color:var(--blue);}
+.psp-ongoing {background:rgba(249,115,22,.12);color:var(--accent);}
+.psp-done    {background:rgba(34,197,94,.12); color:var(--green);}
+.psp-refused {background:rgba(239,68,68,.12); color:var(--red);}
+
+.pcard-route{padding:12px 16px;display:flex;flex-direction:column;gap:5px;}
+.prp{display:flex;align-items:flex-start;gap:8px;font-size:13px;}
+.prp-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.prp-dot.a{background:var(--green);}.prp-dot.b{background:var(--red);}.prp-dot.s{background:var(--yellow);}
+.prp-line{width:2px;height:12px;background:var(--border);margin-left:3px;}
+.prp-addr{color:var(--text2);line-height:1.3;flex:1;font-size:12px;}
+.prp-addr strong{color:var(--text);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px;}
+
+.pcard-metrics{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.pmetric{flex:1;padding:10px 12px;text-align:center;border-right:1px solid var(--border);}
+.pmetric:last-child{border-right:none;}
+.pmetric .pml{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.pmetric .pmv{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+
+.pcard-footer{display:flex;align-items:center;gap:8px;padding:10px 16px;}
+.ppay-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;}
+.ppb-pix {background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.ppb-cash{background:rgba(234,179,8,.1);color:var(--yellow);border:1px solid rgba(234,179,8,.2);}
+.ppb-card{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+
+.pcard-actions{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;}
+.pact{flex:1;min-width:calc(50% - 4px);padding:10px 8px;border:none;border-radius:var(--rs);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;}
+.pact:hover{transform:translateY(-1px);}
+.pact-accept{background:#1d4ed820;color:#60a5fa;border:1px solid #60a5fa40;} .pact-accept:hover{background:#3b82f6;color:#000;}
+.pact-refuse{background:#7f1d1d20;color:#ef4444;border:1px solid #ef444440;} .pact-refuse:hover{background:#ef4444;color:#fff;}
+.pact-start {background:#7c2d1220;color:#f97316;border:1px solid #f9731640;} .pact-start:hover{background:#f97316;color:#fff;}
+.pact-done  {background:#14532d20;color:#22c55e;border:1px solid #22c55e40;} .pact-done:hover{background:#22c55e;color:#000;}
+.pact-wpp   {background:#14532d15;color:#22c55e;border:1px solid #22c55e30;} .pact-wpp:hover{background:#22c55e;color:#000;}
+.pact-map   {background:#1d4ed815;color:#60a5fa;border:1px solid #60a5fa30;} .pact-map:hover{background:#60a5fa;color:#000;}
+.pact-full  {flex:2;}
+
+.pempty{text-align:center;padding:60px 20px;color:var(--text3);}
+.pempty-icon{font-size:48px;margin-bottom:12px;}
+.pempty h3{font-family:'Syne',sans-serif;font-size:16px;color:var(--text2);margin-bottom:6px;}
+
 </style>
 </head>
 <body>
@@ -213,7 +274,7 @@ textarea.f-input{resize:none;height:70px;padding:10px 14px;}
   <div class="logo"><div class="logo-icon">🏍</div>Moto<span>Run</span></div>
   <div class="topbar-right">
     <div class="status-badge"><div class="status-dot"></div>Fortaleza · CE</div>
-    <button class="admin-btn" onclick="openAdmin()">⚙ Admin</button>
+    <button class="admin-btn" onclick="openPiloto()" style="border-color:rgba(249,115,22,.3);color:var(--accent)">🏍️ Painel Piloto</button>
   </div>
 </div>
 
@@ -353,49 +414,62 @@ textarea.f-input{resize:none;height:70px;padding:10px 14px;}
   </div>
 </div>
 
-<!-- ADMIN -->
-<div class="overlay" id="adminOverlay">
-  <div class="login-box" id="loginBox">
-    <div style="font-size:36px;margin-bottom:12px">🏍️</div>
-    <h2>Painel Admin</h2>
-    <p>Entre com sua senha para acessar o dashboard</p>
-    <input class="login-input" type="password" id="adminPass" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Entrar</button>
-    <div class="login-err" id="loginErr">Senha incorreta.</div>
-    <div style="margin-top:16px"><button onclick="closeAdmin()" style="background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer">Cancelar</button></div>
+<!-- PAINEL PILOTO -->
+<div class="overlay" id="pilotoOverlay" style="align-items:stretch;padding:0;">
+  <!-- TELA DE LOGIN -->
+  <div id="pilotoLogin" style="display:flex;align-items:center;justify-content:center;width:100%;min-height:100vh;padding:20px;">
+    <div class="login-box">
+      <div style="font-size:36px;margin-bottom:12px">🏍️</div>
+      <h2>Painel do Piloto</h2>
+      <p style="color:var(--text3);font-size:13px;margin-bottom:24px">Acesso exclusivo do motoboy</p>
+      <input class="login-input" type="password" id="pilotoPass" placeholder="Senha do piloto" onkeydown="if(event.key==='Enter')doPilotoLogin()">
+      <button class="login-btn" onclick="doPilotoLogin()">Entrar</button>
+      <div class="login-err" id="pilotoErr">Senha incorreta.</div>
+      <div style="margin-top:16px"><button onclick="closePiloto()" style="background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer">Cancelar</button></div>
+    </div>
   </div>
-  <div class="dashboard" id="dashBox" style="display:none">
-    <div class="dash-head">
-      <div><h2>📊 Dashboard</h2><div style="font-size:12px;color:var(--text3);margin-top:2px" id="dashPeriod"></div></div>
-      <div class="dash-head-r">
-        <button class="logout-btn" onclick="doLogout()">Sair</button>
-        <button class="dash-close" onclick="closeAdmin()">✕</button>
+
+  <!-- DASHBOARD DO PILOTO -->
+  <div id="pilotoDash" style="display:none;flex-direction:column;width:100%;min-height:100vh;background:var(--bg);">
+
+    <!-- topbar piloto -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:10;">
+      <div style="font-family:Syne,sans-serif;font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">🏍</div>
+        Moto<span style="color:var(--accent)">Run</span>
+        <span style="font-size:11px;color:var(--text3);font-family:DM Sans,sans-serif;font-weight:400">· Piloto</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="pilotoOnlineToggle" onclick="togglePilotoOnline()" style="display:flex;align-items:center;gap:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.4);border-radius:100px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:500;color:var(--green);">
+          <div id="pilotoOnlineDot" style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.6);"></div>
+          <span id="pilotoOnlineLbl">Online</span>
+        </div>
+        <button onclick="doPilotoLogout()" style="background:transparent;border:1px solid var(--border);color:var(--text3);font-family:DM Sans,sans-serif;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;">Sair</button>
+        <button onclick="closePiloto()" style="background:transparent;border:1px solid var(--border);color:var(--text3);font-family:DM Sans,sans-serif;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;">✕ Fechar</button>
       </div>
     </div>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-lbl">Total Semana</div><div class="stat-val ac" id="sTotal">R$ 0,00</div></div>
-      <div class="stat-card"><div class="stat-lbl">Corridas</div><div class="stat-val" id="sCount">0</div></div>
-      <div class="stat-card"><div class="stat-lbl">Km Rodados</div><div class="stat-val yl" id="sKm">0 km</div></div>
-      <div class="stat-card"><div class="stat-lbl">Ticket Médio</div><div class="stat-val gr" id="sAvg">R$ 0,00</div></div>
+
+    <!-- stats bar -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div style="background:var(--surface);padding:14px 20px;text-align:center;"><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:Syne,sans-serif;margin-bottom:4px;">Hoje</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:var(--accent);" id="pStatHoje">R$ 0</div></div>
+      <div style="background:var(--surface);padding:14px 20px;text-align:center;"><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:Syne,sans-serif;margin-bottom:4px;">Corridas</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:var(--blue);" id="pStatCorridas">0</div></div>
+      <div style="background:var(--surface);padding:14px 20px;text-align:center;"><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:Syne,sans-serif;margin-bottom:4px;">Km Hoje</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:var(--yellow);" id="pStatKm">0 km</div></div>
+      <div style="background:var(--surface);padding:14px 20px;text-align:center;"><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-family:Syne,sans-serif;margin-bottom:4px;">Pendentes</div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:var(--green);" id="pStatPend">0</div></div>
     </div>
-    <div class="filter-bar">
-      <span style="font-size:12px;color:var(--text3)">Período:</span>
-      <button class="f-pill active" onclick="setFilter('week',this)">Semana</button>
-      <button class="f-pill" onclick="setFilter('today',this)">Hoje</button>
-      <button class="f-pill" onclick="setFilter('all',this)">Todas</button>
-      <div style="flex:1"></div>
-      <button class="clr-btn" onclick="clearRides()">🗑 Limpar</button>
+
+    <!-- filter tabs -->
+    <div style="display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;" id="pilotoTabs">
+      <div class="ptab active" onclick="setPilotoTab('pending',this)">🟡 Pendentes <span class="ptab-cnt" id="pcnt-pending">0</span></div>
+      <div class="ptab" onclick="setPilotoTab('accepted',this)">🔵 Aceitas <span class="ptab-cnt" id="pcnt-accepted">0</span></div>
+      <div class="ptab" onclick="setPilotoTab('ongoing',this)">🟠 Em Andamento <span class="ptab-cnt" id="pcnt-ongoing">0</span></div>
+      <div class="ptab" onclick="setPilotoTab('done',this)">🟢 Concluídas <span class="ptab-cnt" id="pcnt-done">0</span></div>
+      <div class="ptab" onclick="setPilotoTab('refused',this)">🔴 Recusadas <span class="ptab-cnt" id="pcnt-refused">0</span></div>
+      <div class="ptab" onclick="setPilotoTab('all',this)">📋 Todas <span class="ptab-cnt" id="pcnt-all">0</span></div>
     </div>
-    <div class="tbl-wrap">
-      <table class="rides-tbl">
-        <thead><tr>
-          <th>Cliente</th><th>Rota</th><th>Data/Hora</th>
-          <th>Km</th><th>Pagamento</th><th>Valor</th><th>Status</th><th></th>
-        </tr></thead>
-        <tbody id="ridesTbody"></tbody>
-      </table>
-      <div class="empty-st" id="emptyState" style="display:none"><div>🏍️</div><p>Nenhuma corrida no período.</p></div>
-    </div>
+
+    <!-- rides list -->
+    <div style="flex:1;overflow-y:auto;padding:16px 20px;" id="pilotoRidesList"></div>
+
   </div>
 </div>
 
@@ -409,9 +483,8 @@ textarea.f-input{resize:none;height:70px;padding:10px 14px;}
 ════════════════════════════════════════════════════════ */
 const WHATSAPP   = '5585999888735';   // seu número com DDI
 const PRECO_MIN  = 10.00;
-const FATOR_KM   = 2;
+const FATOR_KM   = 1.60;
 const KM_BASE    = 5;
-const ADMIN_PASS = 'motorun2024';
 
 // PagSeguro — configure em pagseguro.uol.com.br
 // 1. Crie conta em sandbox.pagseguro.uol.com.br (para testes)
@@ -1011,91 +1084,269 @@ function toast(msg,type=''){
 }
 
 /* ════════════════════════════════════════════════════════
-   ADMIN — localStorage
+   PAINEL PILOTO — integrado
 ════════════════════════════════════════════════════════ */
-const STORAGE_KEY='motorun_rides';
-let adminLogged=false, curFilter='week';
+const STORAGE_KEY = 'motorun_rides';
+const PILOT_PASS  = 'piloto2024';  // ← senha do piloto
 
-function saveRide(r){
-  const rides=getRides();
-  rides.unshift({id:Date.now(),ts:new Date().toISOString(),name:r.name,phone:r.phone,origin:r.origin,dest:r.dest,stops:r.stops,km:r.km,price:r.price,durMin:r.durMin,note:r.note,payment:r.payment,pixPaid:r.pixPaid||false});
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(rides));
+function saveRide(r) {
+  const rides = getRides();
+  rides.unshift({ id:Date.now(), ts:new Date().toISOString(), status:'pending',
+    name:r.name, phone:r.phone, origin:r.origin, dest:r.dest,
+    stops:r.stops, km:r.km, price:r.price, durMin:r.durMin,
+    note:r.note, payment:r.payment, pixPaid:r.pixPaid||false });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(rides));
 }
-function getRides(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch{return[];}}
+function getRides() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; } catch { return []; } }
+function setRides(r) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); }
 
-function openAdmin(){
-  document.getElementById('adminOverlay').classList.add('show');
-  if(adminLogged){showDash();return;}
-  document.getElementById('loginBox').style.display='block';
-  document.getElementById('dashBox').style.display='none';
-  document.getElementById('adminPass').value='';
-  document.getElementById('loginErr').style.display='none';
-  setTimeout(()=>document.getElementById('adminPass').focus(),100);
-}
-function closeAdmin(){document.getElementById('adminOverlay').classList.remove('show');}
-function doLogin(){
-  if(document.getElementById('adminPass').value===ADMIN_PASS){adminLogged=true;showDash();}
-  else{document.getElementById('loginErr').style.display='block';document.getElementById('adminPass').value='';}
-}
-function doLogout(){adminLogged=false;document.getElementById('loginBox').style.display='block';document.getElementById('dashBox').style.display='none';}
-function setFilter(f,btn){curFilter=f;document.querySelectorAll('.f-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDash();}
-
-function getFiltered(){
-  const all=getRides(),now=new Date();
-  if(curFilter==='all')return all;
-  if(curFilter==='today')return all.filter(r=>new Date(r.ts).toDateString()===now.toDateString());
-  return all.filter(r=>new Date(r.ts)>=new Date(now-7*86400000));
+function updateStatus(id, status) {
+  const rides = getRides();
+  const r = rides.find(x => x.id === id);
+  if (!r) return;
+  r.status = status;
+  r.updatedAt = new Date().toISOString();
+  if (status === 'ongoing') r.startedAt  = new Date().toISOString();
+  if (status === 'done')    r.finishedAt = new Date().toISOString();
+  setRides(rides);
+  renderPiloto();
 }
 
-function showDash(){
-  document.getElementById('loginBox').style.display='none';
-  document.getElementById('dashBox').style.display='flex';
-  renderDash();
+// ── ABRIR / FECHAR ──
+let pilotoLogged = false;
+let pilotoTab    = 'pending';
+let pilotoOnline = true;
+let pilotoTimer  = null;
+
+function openPiloto() {
+  document.getElementById('pilotoOverlay').classList.add('show');
+  if (pilotoLogged) { showPilotoDash(); return; }
+  document.getElementById('pilotoLogin').style.display = 'flex';
+  document.getElementById('pilotoDash').style.display  = 'none';
+  document.getElementById('pilotoPass').value = '';
+  document.getElementById('pilotoErr').style.display = 'none';
+  setTimeout(() => document.getElementById('pilotoPass').focus(), 100);
+}
+function closePiloto() {
+  document.getElementById('pilotoOverlay').classList.remove('show');
+  clearInterval(pilotoTimer);
+}
+function doPilotoLogin() {
+  if (document.getElementById('pilotoPass').value === PILOT_PASS) {
+    pilotoLogged = true;
+    showPilotoDash();
+  } else {
+    document.getElementById('pilotoErr').style.display = 'block';
+    document.getElementById('pilotoPass').value = '';
+  }
+}
+function doPilotoLogout() {
+  pilotoLogged = false;
+  clearInterval(pilotoTimer);
+  document.getElementById('pilotoLogin').style.display = 'flex';
+  document.getElementById('pilotoDash').style.display  = 'none';
+}
+function showPilotoDash() {
+  document.getElementById('pilotoLogin').style.display = 'none';
+  document.getElementById('pilotoDash').style.display  = 'flex';
+  renderPiloto();
+  // Auto-refresh a cada 8s para pegar novas corridas
+  clearInterval(pilotoTimer);
+  pilotoTimer = setInterval(renderPiloto, 8000);
 }
 
-function renderDash(){
-  const rides=getFiltered();
-  const total=rides.reduce((s,r)=>s+(r.price||0),0);
-  const km=rides.reduce((s,r)=>s+(r.km||0),0);
-  const avg=rides.length?total/rides.length:0;
-  const lbl={week:'Últimos 7 dias',today:'Hoje',all:'Todas'};
-  document.getElementById('dashPeriod').textContent=lbl[curFilter];
-  document.getElementById('sTotal').textContent='R$ '+total.toFixed(2).replace('.',',');
-  document.getElementById('sCount').textContent=rides.length;
-  document.getElementById('sKm').textContent=km.toFixed(1)+' km';
-  document.getElementById('sAvg').textContent='R$ '+avg.toFixed(2).replace('.',',');
-
-  const tbody=document.getElementById('ridesTbody');
-  tbody.innerHTML='';
-  document.getElementById('emptyState').style.display=rides.length?'none':'block';
-
-  rides.forEach(r=>{
-    const d=new Date(r.ts);
-    const dia=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-    const hr=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const par=r.stops?` +${r.stops}p`:'';
-    const payClass=r.payment==='Pix'?'pix':r.payment==='Dinheiro'?'cash':'card';
-    const payLabel=r.payment+(r.pixPaid?' ✅':'');
-    const pi={Pix:'⚡',Dinheiro:'💵',Cartão:'💳'};
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td><div style="font-weight:600">${r.name||'-'}</div><div style="font-size:11px;color:var(--text3)">${r.phone||''}</div></td>
-      <td>
-        <div style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="color:var(--green)">A</span> ${r.origin||'-'}</div>
-        <div style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="color:var(--red)">B</span> ${r.dest||'-'}${par}</div>
-      </td>
-      <td style="white-space:nowrap;color:var(--text2)"><div>${dia}</div><div style="font-size:11px">${hr}</div></td>
-      <td>${(r.km||0).toFixed(1)} km</td>
-      <td><span class="pay-badge ${payClass}">${pi[r.payment]||''} ${payLabel}</span></td>
-      <td style="white-space:nowrap"><span style="color:var(--accent);font-family:Syne,sans-serif;font-weight:700">R$ ${(r.price||0).toFixed(2)}</span></td>
-      <td>${r.pixPaid?'<span style="color:var(--green);font-size:12px">✅ Pago</span>':'<span style="color:var(--text3);font-size:12px">Pendente</span>'}</td>
-      <td><button class="del-btn" onclick="delRide(${r.id})">🗑</button></td>`;
-    tbody.appendChild(tr);
-  });
+function togglePilotoOnline() {
+  pilotoOnline = !pilotoOnline;
+  const tog = document.getElementById('pilotoOnlineToggle');
+  const dot = document.getElementById('pilotoOnlineDot');
+  const lbl = document.getElementById('pilotoOnlineLbl');
+  if (pilotoOnline) {
+    tog.style.cssText = 'display:flex;align-items:center;gap:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.4);border-radius:100px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:500;color:var(--green);';
+    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.6);';
+    lbl.textContent   = 'Online';
+  } else {
+    tog.style.cssText = 'display:flex;align-items:center;gap:6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.3);border-radius:100px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:500;color:var(--red);';
+    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--red);';
+    lbl.textContent   = 'Offline';
+  }
+  toast(pilotoOnline ? '✅ Você está online!' : '⛔ Você está offline', pilotoOnline ? 'ok' : 'err');
 }
 
-function delRide(id){if(!confirm('Excluir?'))return;localStorage.setItem(STORAGE_KEY,JSON.stringify(getRides().filter(r=>r.id!==id)));renderDash();}
-function clearRides(){if(!confirm('Apagar TUDO?'))return;localStorage.removeItem(STORAGE_KEY);renderDash();}
+// ── TABS ──
+function setPilotoTab(tab, el) {
+  pilotoTab = tab;
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderPiloto();
+}
+
+// ── RENDER ──
+function renderPiloto() {
+  const all    = getRides();
+  const today  = new Date().toDateString();
+  const counts = { pending:0, accepted:0, ongoing:0, done:0, refused:0, all:all.length };
+  all.forEach(r => { const s = r.status||'pending'; if(counts[s]!==undefined) counts[s]++; });
+  Object.keys(counts).forEach(k => { const el=document.getElementById('pcnt-'+k); if(el) el.textContent=counts[k]; });
+
+  // stats
+  const todayDone = all.filter(r => r.status==='done' && new Date(r.ts).toDateString()===today);
+  document.getElementById('pStatHoje').textContent     = 'R$ ' + todayDone.reduce((s,r)=>s+(r.price||0),0).toFixed(2);
+  document.getElementById('pStatCorridas').textContent = todayDone.length;
+  document.getElementById('pStatKm').textContent       = todayDone.reduce((s,r)=>s+(r.km||0),0).toFixed(1)+' km';
+  document.getElementById('pStatPend').textContent     = counts.pending;
+
+  const filtered = pilotoTab==='all' ? all : all.filter(r=>(r.status||'pending')===pilotoTab);
+  const list = document.getElementById('pilotoRidesList');
+  list.innerHTML = '';
+
+  if (!filtered.length) {
+    const msgs = {
+      pending:  ['🟡','Nenhuma corrida pendente','Aguardando solicitações dos clientes...'],
+      accepted: ['🔵','Nenhuma corrida aceita','Aceite uma corrida pendente.'],
+      ongoing:  ['🟠','Nenhuma corrida em andamento','Inicie uma corrida aceita.'],
+      done:     ['🟢','Nenhuma corrida concluída','As corridas finalizadas aparecem aqui.'],
+      refused:  ['🔴','Nenhuma corrida recusada',''],
+      all:      ['📋','Nenhuma corrida ainda','Solicite uma corrida para começar.'],
+    };
+    const m = msgs[pilotoTab]||msgs.all;
+    list.innerHTML = `<div class="pempty"><div class="pempty-icon">${m[0]}</div><h3>${m[1]}</h3><p>${m[2]}</p></div>`;
+    return;
+  }
+
+  filtered.forEach(ride => list.appendChild(buildPCard(ride)));
+}
+
+function buildPCard(r) {
+  const status = r.status || 'pending';
+  const card   = document.createElement('div');
+  card.className = `pcard ${status}`;
+
+  const d   = new Date(r.ts);
+  const dia = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const hr  = d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  const SI = {
+    pending:  ['⏳','Aguardando','psp-pending'],
+    accepted: ['✅','Aceita',    'psp-accepted'],
+    ongoing:  ['🏍️','Em Andamento','psp-ongoing'],
+    done:     ['🏁','Concluída', 'psp-done'],
+    refused:  ['❌','Recusada',  'psp-refused'],
+  };
+  const si = SI[status]||SI.pending;
+
+  const initials = (r.name||'C').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const colors   = ['#f97316','#22c55e','#60a5fa','#a78bfa','#eab308','#ef4444'];
+  const bg       = colors[r.id % colors.length];
+
+  const payIcon  = {Pix:'⚡',Dinheiro:'💵','Cartão':'💳'}[r.payment]||'💳';
+  const payCls   = r.pixPaid?'ppb-pix':r.payment==='Pix'?'ppb-pix':r.payment==='Dinheiro'?'ppb-cash':'ppb-card';
+  const payLbl   = r.pixPaid ? payIcon+' Pix ✅' : payIcon+' '+(r.payment||'');
+
+  const stopHtml = r.stops ? `<div class="prp-line"></div><div class="prp"><div class="prp-dot s"></div><div class="prp-addr"><strong>Paradas</strong>${r.stops} parada${r.stops>1?'s':''}</div></div>` : '';
+
+  let extraInfo = '';
+  if (status==='ongoing' && r.startedAt) {
+    const el = Math.round((Date.now()-new Date(r.startedAt))/60000);
+    extraInfo = `<div style="font-size:12px;color:var(--accent);padding:4px 16px 8px;font-weight:600;">🏍️ Em andamento há ${el} min</div>`;
+  }
+  if (status==='done' && r.finishedAt && r.startedAt) {
+    const mins = Math.round((new Date(r.finishedAt)-new Date(r.startedAt))/60000);
+    extraInfo = `<div style="font-size:12px;color:var(--green);padding:4px 16px 8px;">✅ Finalizada em ${mins} min</div>`;
+  }
+
+  card.innerHTML = `
+    <div class="pcard-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="pclient-av" style="background:${bg}20;color:${bg};border:1.5px solid ${bg}50;">${initials}</div>
+        <div><div class="pclient-name">${r.name||'Cliente'}</div><div class="pclient-phone">${r.phone||''}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:var(--text3);">${dia} ${hr}</span>
+        <div class="pstatus-pill ${si[2]}">${si[0]} ${si[1]}</div>
+      </div>
+    </div>
+    <div class="pcard-route">
+      <div class="prp"><div class="prp-dot a"></div><div class="prp-addr"><strong>Partida</strong>${r.origin||'-'}</div></div>
+      ${stopHtml}
+      <div class="prp-line"></div>
+      <div class="prp"><div class="prp-dot b"></div><div class="prp-addr"><strong>Destino</strong>${r.dest||'-'}</div></div>
+    </div>
+    <div class="pcard-metrics">
+      <div class="pmetric"><div class="pml">Distância</div><div class="pmv">${(r.km||0).toFixed(1)} km</div></div>
+      <div class="pmetric"><div class="pml">Tempo</div><div class="pmv">${r.durMin||'—'} min</div></div>
+      <div class="pmetric"><div class="pml">Valor</div><div class="pmv" style="color:var(--accent)">R$ ${(r.price||0).toFixed(2)}</div></div>
+    </div>
+    <div class="pcard-footer">
+      <span class="ppay-badge ${payCls}">${payLbl}</span>
+      ${r.note ? `<span style="font-size:11px;color:var(--text3);margin-left:6px;font-style:italic;">📝 ${r.note}</span>` : ''}
+    </div>
+    ${extraInfo}
+    <div class="pcard-actions">${buildPActions(r)}</div>`;
+
+  return card;
+}
+
+function buildPActions(r) {
+  const id = r.id, status = r.status||'pending';
+  const phone = (r.phone||'').replace(/\D/g,'');
+  const num   = phone.startsWith('55') ? phone : '55'+phone;
+  const orig  = encodeURIComponent((r.origin||'')+', Fortaleza, CE');
+  const dest  = encodeURIComponent((r.dest||'')+', Fortaleza, CE');
+  const mapUrl= `https://www.google.com/maps/dir/?api=1&origin=${orig}&destination=${dest}&travelmode=driving`;
+
+  const wppBtn = `<button class="pact pact-wpp" onclick="window.open('https://wa.me/${num}?text='+encodeURI('Olá ${r.name||''}! Sou o motoboy MotoRun 🏍️'),'_blank')">📲 WhatsApp</button>`;
+  const mapBtn = `<button class="pact pact-map" onclick="window.open('${mapUrl}','_blank')">🗺️ Rota</button>`;
+
+  if (status === 'pending') return `
+    <button class="pact pact-accept" onclick="pAccept(${id})">✅ Aceitar</button>
+    <button class="pact pact-refuse" onclick="pRefuse(${id})">❌ Recusar</button>
+    ${wppBtn}${mapBtn}`;
+
+  if (status === 'accepted') return `
+    <button class="pact pact-start pact-full" onclick="pStart(${id})">🏍️ Iniciar Corrida</button>
+    ${wppBtn}${mapBtn}
+    <button class="pact pact-refuse" onclick="pRefuse(${id})">❌ Cancelar</button>`;
+
+  if (status === 'ongoing') return `
+    <button class="pact pact-done pact-full" onclick="pDone(${id})">🏁 Concluir Corrida</button>
+    ${wppBtn}${mapBtn}`;
+
+  if (status === 'done') return `${wppBtn}${mapBtn}`;
+
+  if (status === 'refused') return `
+    <button class="pact pact-accept" onclick="pAccept(${id})">↩️ Reativar</button>`;
+
+  return '';
+}
+
+// ── AÇÕES DO PILOTO ──
+function pilotoNotify(ride, msg) {
+  const ph  = (ride.phone||'').replace(/\D/g,'');
+  const num = ph.startsWith('55') ? ph : '55'+ph;
+  if (num.length >= 12) window.open('https://wa.me/'+num+'?text='+encodeURI(msg), '_blank');
+}
+
+function pAccept(id) {
+  updateStatus(id, 'accepted');
+  const r = getRides().find(x=>x.id===id);
+  if (r) pilotoNotify(r, '✅ *MotoRun — Corrida Aceita!*\n\nOlá '+r.name+'! Sua corrida foi aceita e o motoboy está a caminho.\n\n📍 '+r.origin+'\n🏁 '+r.dest+'\n💰 R$ '+(r.price||0).toFixed(2));
+  toast('✅ Corrida aceita!', 'ok');
+}
+function pRefuse(id) {
+  if (!window.confirm('Recusar esta corrida?')) return;
+  updateStatus(id, 'refused');
+  toast('Corrida recusada.', 'err');
+}
+function pStart(id) {
+  updateStatus(id, 'ongoing');
+  toast('🏍️ Corrida iniciada!', 'ok');
+}
+function pDone(id) {
+  updateStatus(id, 'done');
+  const r = getRides().find(x=>x.id===id);
+  if (r) setTimeout(()=>pilotoNotify(r, '🏁 *MotoRun — Entrega Concluída!*\n\nObrigado '+r.name+'! Sua entrega foi finalizada.\n💰 Valor: R$ '+(r.price||0).toFixed(2)+'\n\nUse sempre o MotoRun! 🏍️'), 400);
+  toast('🏁 Corrida concluída!', 'ok');
+}
 </script>
 
 <!-- Google Maps com Places, Geometry e Directions -->
