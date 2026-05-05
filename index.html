@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotoRun — Entregas Rápidas em Fortaleza</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Barlow+Condensed:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#080808; color:#f0ece4; font-family:'Barlow',sans-serif; overflow-x:hidden; cursor:default; }
+
+/* ── VARS ── */
+:root {
+  --or:#f97316; --or2:#fb923c; --or-dim:#7c3912;
+  --bg:#080808; --bg2:#0f0f0f; --bg3:#161616;
+  --border:#222; --border2:#2e2e2e;
+  --text:#f0ece4; --text2:#9a9186; --text3:#4a4540;
+  --green:#22c55e; --red:#ef4444;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:#0f0f0f; }
+::-webkit-scrollbar-thumb { background:#333; border-radius:4px; }
+
+/* ─────────────────────────────────────
+   NOISE OVERLAY
+───────────────────────────────────── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:1000; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.35;
+}
+
+/* ─────────────────────────────────────
+   NAV
+───────────────────────────────────── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:500;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 5%; height:68px;
+  background:rgba(8,8,8,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  transition:background .3s;
+}
+.nav-logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px; letter-spacing:2px;
+  color:var(--text);
+  display:flex; align-items:center; gap:10px;
+}
+.nav-logo .dot { color:var(--or); }
+.nav-logo-icon {
+  width:34px; height:34px;
+  background:var(--or);
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+}
+.nav-links {
+  display:flex; align-items:center; gap:32px;
+  list-style:none;
+}
+.nav-links a {
+  font-size:13px; font-weight:500; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--text2);
+  text-decoration:none; transition:color .2s;
+}
+.nav-links a:hover { color:var(--text); }
+.nav-cta {
+  background:var(--or); color:#000 !important;
+  padding:10px 22px; border-radius:6px;
+  font-weight:600 !important; letter-spacing:1px !important;
+  transition:background .2s, transform .2s !important;
+}
+.nav-cta:hover { background:var(--or2) !important; transform:translateY(-1px) !important; }
+.nav-mobile-btn { display:none; }
+
+/* ─────────────────────────────────────
+   HERO
+───────────────────────────────────── */
+.hero {
+  min-height:100vh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:120px 5% 80px;
+  position:relative; overflow:hidden;
+}
+
+/* big gradient orb */
+.hero::before {
+  content:'';
+  position:absolute;
+  top:-20%; right:-10%;
+  width:700px; height:700px;
+  background:radial-gradient(circle, rgba(249,115,22,.18) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero::after {
+  content:'';
+  position:absolute;
+  bottom:-30%; left:-5%;
+  width:500px; height:500px;
+  background:radial-gradient(circle, rgba(249,115,22,.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* diagonal speed lines */
+.speed-lines {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+}
+.speed-lines span {
+  position:absolute; right:0;
+  height:1px; background:linear-gradient(to left, rgba(249,115,22,.2), transparent);
+  animation:streak var(--dur,2s) linear infinite var(--delay,0s);
+  transform-origin:right center;
+}
+@keyframes streak {
+  0%   { width:0; opacity:0; transform:scaleX(0); }
+  20%  { opacity:1; }
+  100% { width:40%; opacity:0; transform:scaleX(1); }
+}
+
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:10px;
+  font-size:12px; font-weight:600; letter-spacing:3px; text-transform:uppercase;
+  color:var(--or); margin-bottom:28px;
+  animation:fadeUp .8s ease both;
+}
+.hero-eyebrow::before {
+  content:''; display:block;
+  width:32px; height:2px; background:var(--or);
+}
+
+.hero h1 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(72px,10vw,160px);
+  line-height:.92;
+  letter-spacing:2px;
+  color:var(--text);
+  animation:fadeUp .9s ease .1s both;
+}
+.hero h1 em {
+  color:var(--or); font-style:normal;
+  position:relative;
+}
+
+.hero-sub {
+  font-size:clamp(15px,1.6vw,19px);
+  color:var(--text2); font-weight:300; line-height:1.7;
+  max-width:520px; margin:28px 0 44px;
+  animation:fadeUp 1s ease .2s both;
+}
+
+.hero-actions {
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  animation:fadeUp 1s ease .35s both;
+}
+.btn-primary {
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--or); color:#000;
+  padding:16px 32px; border-radius:6px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  text-decoration:none; transition:all .2s;
+  position:relative; overflow:hidden;
+}
+.btn-primary::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+}
+.btn-primary:hover { background:var(--or2); transform:translateY(-2px); box-shadow:0 12px 40px rgba(249,115,22,.4); }
+.btn-secondary {
+  display:inline-flex; align-items:center; gap:8px;
+  color:var(--text2); font-size:14px; font-weight:500; letter-spacing:1px;
+  text-decoration:none; text-transform:uppercase;
+  padding:16px 20px; border:1px solid var(--border2); border-radius:6px;
+  transition:all .2s;
+}
+.btn-secondary:hover { color:var(--text); border-color:#444; }
+
+/* hero stats */
+.hero-stats {
+  display:flex; gap:48px; margin-top:72px;
+  padding-top:40px; border-top:1px solid var(--border);
+  animation:fadeUp 1s ease .5s both;
+  flex-wrap:wrap;
+}
+.hero-stat .num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px; color:var(--text); line-height:1;
+  display:flex; align-items:baseline; gap:4px;
+}
+.hero-stat .num span { font-size:28px; color:var(--or); }
+.hero-stat .lbl { font-size:12px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
+
+/* scrolling ticker */
+.ticker-wrap {
+  overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  padding:14px 0; background:var(--bg2);
+}
+.ticker {
+  display:flex; gap:0; width:max-content;
+  animation:ticker 20s linear infinite;
+}
+.ticker-item {
+  display:flex; align-items:center; gap:16px;
+  padding:0 32px; white-space:nowrap;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:14px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:var(--text3);
+}
+.ticker-item .sep { color:var(--or); font-size:18px; }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(30px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ─────────────────────────────────────
+   SERVICES
+───────────────────────────────────── */
+.services {
+  padding:120px 5%;
+  position:relative;
+}
+.section-label {
+  font-size:11px; font-weight:600; letter-spacing:4px; text-transform:uppercase;
+  color:var(--or); margin-bottom:16px;
+  display:flex; align-items:center; gap:12px;
+}
+.section-label::after { content:''; flex:0 0 40px; height:1px; background:var(--or); }
+
+.section-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(44px,6vw,90px);
+  line-height:.95; letter-spacing:1px;
+  color:var(--text); margin-bottom:64px;
+}
+
+.services-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--border);
+  border:1px solid var(--border);
+}
+.service-card {
+  background:var(--bg2);
+  padding:40px 36px;
+  position:relative; overflow:hidden;
+  transition:background .3s;
+}
+.service-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(to right, var(--or), transparent);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .4s ease;
+}
+.service-card:hover { background:#131313; }
+.service-card:hover::before { transform:scaleX(1); }
+
+.service-icon {
+  width:56px; height:56px;
+  background:rgba(249,115,22,.08);
+  border:1px solid rgba(249,115,22,.2);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; margin-bottom:28px;
+  transition:all .3s;
+}
+.service-card:hover .service-icon {
+  background:rgba(249,115,22,.15);
+  border-color:rgba(249,115,22,.4);
+  transform:scale(1.05);
+}
+.service-num {
+  position:absolute; top:32px; right:32px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:64px; color:rgba(255,255,255,.03);
+  line-height:1; user-select:none;
+}
+.service-card h3 {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:22px; font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; color:var(--text);
+  margin-bottom:12px;
+}
+.service-card p {
+  font-size:15px; color:var(--text2); line-height:1.7; font-weight:300;
+}
+.service-tags {
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:20px;
+}
+.stag {
+  font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  color:var(--or); background:rgba(249,115,22,.08);
+  border:1px solid rgba(249,115,22,.15);
+  padding:4px 10px; border-radius:4px;
+}
+
+/* ─────────────────────────────────────
+   HOW IT WORKS
+───────────────────────────────────── */
+.how {
+  padding:120px 5%;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  position:relative; overflow:hidden;
+}
+.how::before {
+  content:'';
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:600px; height:600px;
+  background:radial-gradient(circle,rgba(249,115,22,.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.how-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:0;
+  margin-top:64px; position:relative;
+}
+.how-grid::before {
+  content:'';
+  position:absolute; top:36px; left:10%; right:10%;
+  height:1px; background:linear-gradient(to right, transparent, var(--or-dim), var(--or-dim), transparent);
+  pointer-events:none;
+}
+.how-step { padding:0 24px; text-align:center; }
+.how-num {
+  width:72px; height:72px; border-radius:50%;
+  background:var(--bg); border:1px solid var(--or-dim);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--or);
+  margin:0 auto 28px; position:relative; z-index:1;
+  transition:all .3s;
+}
+.how-step:hover .how-num {
+  background:rgba(249,115,22,.1);
+  border-color:var(--or);
+  box-shadow:0 0 24px rgba(249,115,22,.25);
+}
+.how-step h4 {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text); margin-bottom:10px;
+}
+.how-step p { font-size:14px; color:var(--text2); line-height:1.6; font-weight:300; }
+
+/* ─────────────────────────────────────
+   FEATURES / WHY US
+───────────────────────────────────── */
+.features {
+  padding:120px 5%;
+  display:grid; grid-template-columns:1fr 1fr; gap:80px;
+  align-items:center;
+}
+.features-text {}
+.features-text .section-title { margin-bottom:24px; }
+.features-text p {
+  font-size:16px; color:var(--text2); line-height:1.8; font-weight:300;
+  margin-bottom:40px;
+}
+.feat-list { display:flex; flex-direction:column; gap:20px; }
+.feat-item {
+  display:flex; gap:16px; align-items:flex-start;
+  padding:20px; border:1px solid var(--border);
+  border-radius:10px; background:var(--bg2);
+  transition:border-color .2s, background .2s;
+}
+.feat-item:hover { border-color:var(--border2); background:#131313; }
+.feat-icon {
+  width:44px; height:44px; border-radius:10px; flex-shrink:0;
+  background:rgba(249,115,22,.08); border:1px solid rgba(249,115,22,.2);
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.feat-item h4 {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text); margin-bottom:4px;
+}
+.feat-item p { font-size:14px; color:var(--text2); line-height:1.5; font-weight:300; }
+
+/* big visual side */
+.features-visual {
+  position:relative;
+}
+.fv-card {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:16px; padding:28px;
+  position:relative; overflow:hidden;
+}
+.fv-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:3px; background:linear-gradient(to right,var(--or),var(--or2),transparent);
+}
+.fv-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.fv-avatar {
+  width:44px; height:44px; background:rgba(249,115,22,.15);
+  border-radius:50%; border:2px solid rgba(249,115,22,.3);
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.fv-name { font-weight:600; font-size:15px; }
+.fv-sub  { font-size:12px; color:var(--text3); margin-top:1px; }
+.fv-status {
+  margin-left:auto; display:flex; align-items:center; gap:6px;
+  font-size:12px; font-weight:600; color:var(--green);
+  background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2);
+  padding:5px 10px; border-radius:100px;
+}
+.fv-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse2 1.5s infinite; }
+@keyframes pulse2 { 0%,100%{opacity:1}50%{opacity:.4} }
+
+.fv-route { margin-bottom:20px; }
+.fv-point { display:flex; align-items:flex-start; gap:12px; margin-bottom:8px; font-size:14px; color:var(--text2); }
+.fv-dot2 { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+.fv-dot2.a { background:var(--green); }
+.fv-dot2.b { background:var(--red); }
+.fv-vline { width:2px; height:20px; background:var(--border2); margin-left:4px; }
+
+.fv-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.fv-metric { background:var(--bg3); border-radius:8px; padding:14px; text-align:center; border:1px solid var(--border); }
+.fv-metric .ml { font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.fv-metric .mv { font-family:'Bebas Neue',sans-serif; font-size:22px; }
+.fv-metric .mv.or { color:var(--or); }
+.fv-metric .mv.gr { color:var(--green); }
+
+.fv-badge {
+  position:absolute; top:-16px; right:24px;
+  background:var(--or); color:#000;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:6px 16px; border-radius:4px;
+}
+
+/* floating pills */
+.fv-pill {
+  position:absolute; display:flex; align-items:center; gap:8px;
+  background:var(--bg3); border:1px solid var(--border2);
+  border-radius:100px; padding:10px 16px;
+  font-size:13px; font-weight:500;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  animation:float var(--dur,4s) ease-in-out infinite var(--delay,0s);
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+/* ─────────────────────────────────────
+   PRICING
+───────────────────────────────────── */
+.pricing {
+  padding:120px 5%;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+}
+.pricing-card {
+  max-width:600px; margin:64px auto 0;
+  background:var(--bg); border:1px solid var(--border2);
+  border-radius:20px; overflow:hidden;
+  position:relative;
+}
+.pricing-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:4px; background:linear-gradient(to right, var(--or), var(--or2));
+}
+.pricing-head {
+  padding:40px 40px 32px;
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+.pricing-head .badge {
+  display:inline-block; background:rgba(249,115,22,.1);
+  border:1px solid rgba(249,115,22,.25); color:var(--or);
+  font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  padding:5px 14px; border-radius:4px; margin-bottom:20px;
+}
+.pricing-head h3 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:52px; color:var(--text); line-height:1;
+}
+.pricing-head .price-val {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:80px; color:var(--or); line-height:1;
+  display:flex; align-items:flex-start; justify-content:center; gap:8px;
+  margin:16px 0 8px;
+}
+.price-val .currency { font-size:36px; margin-top:12px; color:var(--or-dim); }
+.price-val .cents    { font-size:36px; margin-top:12px; color:var(--or); }
+.pricing-head small { color:var(--text3); font-size:13px; }
+
+.pricing-body { padding:32px 40px; }
+.pricing-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 0; border-bottom:1px solid var(--border);
+  font-size:15px;
+}
+.pricing-row:last-child { border-bottom:none; }
+.pricing-row .pk { color:var(--text2); font-weight:300; }
+.pricing-row .pv { font-weight:600; color:var(--text); font-family:'Barlow Condensed',sans-serif; font-size:16px; letter-spacing:.5px; }
+.pricing-row .pv.or { color:var(--or); }
+
+.pricing-cta { padding:0 40px 40px; }
+.pricing-cta a {
+  display:block; text-align:center;
+  background:var(--or); color:#000;
+  padding:18px; border-radius:8px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:18px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  text-decoration:none; transition:all .2s;
+}
+.pricing-cta a:hover { background:var(--or2); transform:translateY(-2px); box-shadow:0 12px 40px rgba(249,115,22,.4); }
+
+/* ─────────────────────────────────────
+   COVERAGE
+───────────────────────────────────── */
+.coverage {
+  padding:120px 5%;
+  display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;
+}
+.coverage-text .section-title { margin-bottom:20px; }
+.coverage-text p { font-size:16px; color:var(--text2); line-height:1.8; font-weight:300; margin-bottom:32px; }
+.city-list { display:flex; flex-direction:column; gap:10px; }
+.city-item {
+  display:flex; align-items:center; gap:12px;
+  font-size:15px; color:var(--text2); font-weight:400;
+}
+.city-item::before {
+  content:''; display:block; width:6px; height:6px;
+  border-radius:50%; background:var(--or); flex-shrink:0;
+}
+.coverage-map {
+  position:relative; border:1px solid var(--border2);
+  border-radius:16px; overflow:hidden;
+  background:linear-gradient(135deg,#0f0f0f 0%, #141414 100%);
+  aspect-ratio:4/3; display:flex; align-items:center; justify-content:center;
+}
+/* SVG map placeholder with dots */
+.map-bg {
+  position:absolute; inset:0; opacity:.08;
+  background-image: repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 40px),
+                    repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 40px);
+}
+.map-center { text-align:center; position:relative; z-index:1; }
+.map-icon { font-size:64px; margin-bottom:16px; display:block; }
+.map-label {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px; color:var(--text); letter-spacing:3px;
+}
+.map-sub { font-size:13px; color:var(--text3); margin-top:4px; }
+.map-pulse {
+  position:absolute; width:120px; height:120px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(249,115,22,.3),transparent);
+  animation:mapPulse 2s ease-out infinite;
+}
+@keyframes mapPulse { 0%{transform:scale(0);opacity:1} 100%{transform:scale(3);opacity:0} }
+
+/* ─────────────────────────────────────
+   TESTIMONIALS
+───────────────────────────────────── */
+.testimonials {
+  padding:120px 5%;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+}
+.testi-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+  margin-top:64px;
+}
+.testi-card {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:14px; padding:28px;
+  transition:border-color .2s;
+}
+.testi-card:hover { border-color:var(--border2); }
+.testi-stars { color:var(--or); font-size:16px; letter-spacing:2px; margin-bottom:16px; }
+.testi-text {
+  font-size:15px; color:var(--text2); line-height:1.7;
+  font-weight:300; font-style:italic; margin-bottom:20px;
+}
+.testi-author { display:flex; align-items:center; gap:12px; }
+.testi-av {
+  width:40px; height:40px; border-radius:50%;
+  background:var(--bg3); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.testi-name { font-weight:600; font-size:14px; }
+.testi-loc  { font-size:12px; color:var(--text3); margin-top:1px; }
+
+/* ─────────────────────────────────────
+   CTA BANNER
+───────────────────────────────────── */
+.cta-banner {
+  margin:0 5% 120px;
+  background:var(--or);
+  border-radius:20px;
+  padding:80px 60px;
+  display:flex; align-items:center; justify-content:space-between; gap:40px;
+  position:relative; overflow:hidden;
+  flex-wrap:wrap;
+}
+.cta-banner::before {
+  content:'';
+  position:absolute; top:-50%; right:-5%;
+  width:400px; height:400px;
+  background:rgba(0,0,0,.1);
+  border-radius:50%;
+  pointer-events:none;
+}
+.cta-banner::after {
+  content:'🏍️';
+  position:absolute; right:60px; top:50%;
+  transform:translateY(-50%);
+  font-size:120px; opacity:.12;
+  pointer-events:none;
+}
+.cta-text h2 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,5vw,68px);
+  color:#000; line-height:.95; letter-spacing:1px;
+  margin-bottom:12px;
+}
+.cta-text p { font-size:16px; color:rgba(0,0,0,.6); font-weight:400; }
+.cta-banner .btn-dark {
+  display:inline-flex; align-items:center; gap:10px;
+  background:#000; color:var(--or);
+  padding:18px 36px; border-radius:8px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  text-decoration:none; white-space:nowrap;
+  transition:all .2s; flex-shrink:0;
+}
+.cta-banner .btn-dark:hover { background:#111; transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,.3); }
+
+/* ─────────────────────────────────────
+   FOOTER
+───────────────────────────────────── */
+footer {
+  border-top:1px solid var(--border);
+  padding:48px 5% 32px;
+}
+.footer-top {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  gap:40px; flex-wrap:wrap; margin-bottom:40px;
+}
+.footer-brand .nav-logo { margin-bottom:12px; }
+.footer-brand p { font-size:14px; color:var(--text3); max-width:280px; line-height:1.6; font-weight:300; }
+.footer-links h4 {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:var(--text2); margin-bottom:16px;
+}
+.footer-links ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.footer-links a { color:var(--text3); text-decoration:none; font-size:14px; transition:color .2s; }
+.footer-links a:hover { color:var(--text); }
+.footer-bottom {
+  border-top:1px solid var(--border);
+  padding-top:24px;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+}
+.footer-bottom p { font-size:13px; color:var(--text3); }
+.footer-wpp {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2);
+  color:var(--green); padding:8px 18px; border-radius:100px;
+  font-size:13px; font-weight:600; text-decoration:none;
+  transition:all .2s;
+}
+.footer-wpp:hover { background:rgba(34,197,94,.2); }
+
+/* ─────────────────────────────────────
+   SCROLL ANIMATIONS
+───────────────────────────────────── */
+.reveal {
+  opacity:0; transform:translateY(40px);
+  transition:opacity .8s ease, transform .8s ease;
+}
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-delay-1 { transition-delay:.1s; }
+.reveal-delay-2 { transition-delay:.2s; }
+.reveal-delay-3 { transition-delay:.3s; }
+.reveal-delay-4 { transition-delay:.4s; }
+
+/* ─────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────── */
+@media(max-width:1024px) {
+  .services-grid { grid-template-columns:repeat(2,1fr); }
+  .features      { grid-template-columns:1fr; }
+  .features-visual { display:none; }
+  .coverage      { grid-template-columns:1fr; }
+  .coverage-map  { display:none; }
+  .testi-grid    { grid-template-columns:repeat(2,1fr); }
+  .how-grid      { grid-template-columns:repeat(2,1fr); gap:40px; }
+  .how-grid::before { display:none; }
+}
+@media(max-width:768px) {
+  .nav-links { display:none; }
+  .services-grid { grid-template-columns:1fr; }
+  .testi-grid    { grid-template-columns:1fr; }
+  .cta-banner    { padding:48px 32px; }
+  .cta-banner::after { display:none; }
+  .hero-stats    { gap:32px; }
+  .how-grid      { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🏍</div>
+    MOTO<span class="dot">RUN</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#como-funciona">Como Funciona</a></li>
+    <li><a href="#precos">Preços</a></li>
+    <li><a href="#cobertura">Cobertura</a></li>
+    <li><a href="motoboy-app.html" class="nav-cta">Solicitar Corrida →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="speed-lines" id="speedLines"></div>
+
+  <div class="hero-eyebrow">Entregas expressas em Fortaleza</div>
+
+  <h1>RÁPIDO<br>COMO<br><em>VOCÊ</em><br>PRECISA.</h1>
+
+  <p class="hero-sub">
+    Entregas de documentos, compras e pacotes com motoboy profissional.
+    Atendendo Fortaleza e região metropolitana com agilidade e segurança.
+  </p>
+
+  <div class="hero-actions">
+    <a href="motoboy-app.html" class="btn-primary">
+      🏍️ Solicitar Agora
+    </a>
+    <a href="#como-funciona" class="btn-secondary">
+      Como funciona →
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">30<span>min</span></div>
+      <div class="lbl">Tempo médio de entrega</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">7<span>dias</span></div>
+      <div class="lbl">Por semana, sem parar</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">R$<span>10</span></div>
+      <div class="lbl">A partir de por corrida</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item"><span>Entregas Rápidas</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Documentos</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Compras do Mercado</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Farmácias</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Fortaleza e Região</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Pagamento Pix</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Rastreio em Tempo Real</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Entregas Rápidas</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Documentos</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Compras do Mercado</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Farmácias</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Fortaleza e Região</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Pagamento Pix</span><span class="sep">✦</span></div>
+    <div class="ticker-item"><span>Rastreio em Tempo Real</span><span class="sep">✦</span></div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="servicos">
+  <div class="section-label reveal">O que fazemos</div>
+  <h2 class="section-title reveal reveal-delay-1">NOSSOS<br>SERVIÇOS</h2>
+
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-num">01</div>
+      <div class="service-icon">📦</div>
+      <h3>Entregas Rápidas</h3>
+      <p>Seu pacote do ponto A ao ponto B com a máxima velocidade e cuidado. Ideal para pequenos volumes com urgência.</p>
+      <div class="service-tags">
+        <span class="stag">Express</span>
+        <span class="stag">Até 10kg</span>
+        <span class="stag">Rastreado</span>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-num">02</div>
+      <div class="service-icon">📋</div>
+      <h3>Documentos</h3>
+      <p>Contratos, cartórios, bancos, escritórios. Entregamos seus documentos com segurança e comprovante de recebimento.</p>
+      <div class="service-tags">
+        <span class="stag">Seguro</span>
+        <span class="stag">Com Recibo</span>
+        <span class="stag">Urgente</span>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-num">03</div>
+      <div class="service-icon">🛒</div>
+      <h3>Compras</h3>
+      <p>Busque em mercados, farmácias, lojas e restaurantes. Você pede, a gente busca e entrega na sua porta.</p>
+      <div class="service-tags">
+        <span class="stag">Mercado</span>
+        <span class="stag">Farmácia</span>
+        <span class="stag">Restaurante</span>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-3">
+      <div class="service-num">04</div>
+      <div class="service-icon">🔄</div>
+      <h3>Coleta e Devolução</h3>
+      <p>Coletamos itens para devolução em lojas, e-commerces e correios. Simples, rápido e sem você sair de casa.</p>
+      <div class="service-tags">
+        <span class="stag">E-commerce</span>
+        <span class="stag">Correios</span>
+        <span class="stag">Lojas</span>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-4">
+      <div class="service-num">05</div>
+      <div class="service-icon">🛑</div>
+      <h3>Multi-paradas</h3>
+      <p>Faça até 3 paradas em uma única corrida. Otimizamos a rota automaticamente para você economizar tempo e dinheiro.</p>
+      <div class="service-tags">
+        <span class="stag">Até 3 paradas</span>
+        <span class="stag">Rota otimizada</span>
+      </div>
+    </div>
+    <div class="service-card reveal reveal-delay-4">
+      <div class="service-num">06</div>
+      <div class="service-icon">⚡</div>
+      <h3>Sob Demanda</h3>
+      <p>Sem mensalidade, sem contrato. Solicite quando precisar e pague apenas pelo que usar. Total flexibilidade.</p>
+      <div class="service-tags">
+        <span class="stag">Sem contrato</span>
+        <span class="stag">Pague por uso</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="como-funciona">
+  <div class="section-label reveal">Simples assim</div>
+  <h2 class="section-title reveal reveal-delay-1">COMO<br>FUNCIONA</h2>
+  <div class="how-grid">
+    <div class="how-step reveal">
+      <div class="how-num">1</div>
+      <h4>Informe os Endereços</h4>
+      <p>Digite o ponto de partida, as paradas e o destino. O autocomplete busca só em Fortaleza.</p>
+    </div>
+    <div class="how-step reveal reveal-delay-1">
+      <div class="how-num">2</div>
+      <h4>Veja a Rota e o Valor</h4>
+      <p>A rota real é traçada no mapa e o valor calculado automaticamente. Sem surpresas.</p>
+    </div>
+    <div class="how-step reveal reveal-delay-2">
+      <div class="how-num">3</div>
+      <h4>Escolha o Pagamento</h4>
+      <p>Pix online, dinheiro ou cartão. Você decide na hora de solicitar.</p>
+    </div>
+    <div class="how-step reveal reveal-delay-3">
+      <div class="how-num">4</div>
+      <h4>Motoboy a Caminho</h4>
+      <p>Receba confirmação via WhatsApp e acompanhe. Entregamos com rapidez e cuidado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-text">
+    <div class="section-label reveal">Por que nos escolher</div>
+    <h2 class="section-title reveal reveal-delay-1">FEITO PARA<br>SER RÁPIDO.</h2>
+    <p class="reveal reveal-delay-2">
+      Cada detalhe do MotoRun foi pensado para economizar o seu tempo.
+      Da solicitação até a entrega, tudo acontece com agilidade e transparência.
+    </p>
+    <div class="feat-list">
+      <div class="feat-item reveal reveal-delay-1">
+        <div class="feat-icon">🗺️</div>
+        <div>
+          <h4>Rota Real no Mapa</h4>
+          <p>Google Maps traça o caminho real pelas ruas de Fortaleza. Distância e tempo precisos.</p>
+        </div>
+      </div>
+      <div class="feat-item reveal reveal-delay-2">
+        <div class="feat-icon">✨</div>
+        <div>
+          <h4>Rota Otimizada</h4>
+          <p>Com múltiplas paradas, o sistema reordena automaticamente para o menor trajeto possível.</p>
+        </div>
+      </div>
+      <div class="feat-item reveal reveal-delay-3">
+        <div class="feat-icon">💬</div>
+        <div>
+          <h4>Confirmação via WhatsApp</h4>
+          <p>Você e o destinatário recebem atualizações em tempo real direto no WhatsApp.</p>
+        </div>
+      </div>
+      <div class="feat-item reveal reveal-delay-4">
+        <div class="feat-icon">⚡</div>
+        <div>
+          <h4>Pix Online na Hora</h4>
+          <p>Gere o QR Code e pague antes mesmo do motoboy sair. Rápido e seguro via PagSeguro.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-visual">
+    <div style="position:relative;padding-top:40px;">
+      <div class="fv-badge">Ao Vivo</div>
+      <div class="fv-card">
+        <div class="fv-header">
+          <div class="fv-avatar">🏍️</div>
+          <div>
+            <div class="fv-name">MotoRun · Piloto</div>
+            <div class="fv-sub">Entregador verificado</div>
+          </div>
+          <div class="fv-status"><div class="fv-dot"></div>Em rota</div>
+        </div>
+        <div class="fv-route">
+          <div class="fv-point"><div class="fv-dot2 a"></div>Rua Osvaldo Cruz, 120 — Meireles</div>
+          <div class="fv-vline"></div>
+          <div class="fv-point"><div class="fv-dot2 b"></div>Av. Beira Mar, 3080 — Mucuripe</div>
+        </div>
+        <div class="fv-metrics">
+          <div class="fv-metric"><div class="ml">Distância</div><div class="mv or">4.2 km</div></div>
+          <div class="fv-metric"><div class="ml">Tempo</div><div class="mv gr">~12 min</div></div>
+          <div class="fv-metric"><div class="ml">Valor</div><div class="mv">R$ 10</div></div>
+        </div>
+      </div>
+
+      <!-- floating pills -->
+      <div class="fv-pill" style="top:-10px;left:-30px;--dur:3.5s;--delay:0s;">
+        <span>✅</span> Corrida aceita!
+      </div>
+      <div class="fv-pill" style="bottom:40px;right:-20px;--dur:4s;--delay:.8s;">
+        <span>⚡</span> Pix confirmado
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="precos">
+  <div class="section-label reveal" style="justify-content:center">Transparência total</div>
+  <h2 class="section-title reveal reveal-delay-1" style="text-align:center">PREÇO<br>JUSTO</h2>
+
+  <div class="pricing-card reveal reveal-delay-2">
+    <div class="pricing-head">
+      <div class="badge">Tarifa Única</div>
+      <h3>Sem Taxa de Adesão</h3>
+      <div class="price-val">
+        <span class="currency">R$</span>
+        <span>10</span>
+        <span class="cents">,00</span>
+      </div>
+      <small>Valor mínimo por corrida (até 5 km)</small>
+    </div>
+    <div class="pricing-body">
+      <div class="pricing-row">
+        <span class="pk">Até 5 km</span>
+        <span class="pv or">R$ 10,00 fixo</span>
+      </div>
+      <div class="pricing-row">
+        <span class="pk">Acima de 5 km</span>
+        <span class="pv">+ R$ 1,60 / km</span>
+      </div>
+      <div class="pricing-row">
+        <span class="pk">Paradas extras (até 3)</span>
+        <span class="pv">Incluídas na rota</span>
+      </div>
+      <div class="pricing-row">
+        <span class="pk">Taxa de serviço</span>
+        <span class="pv or">Nenhuma</span>
+      </div>
+      <div class="pricing-row">
+        <span class="pk">Pagamento</span>
+        <span class="pv">Pix · Dinheiro · Cartão</span>
+      </div>
+    </div>
+    <div class="pricing-cta">
+      <a href="motoboy-app.html">Calcular minha corrida →</a>
+    </div>
+  </div>
+</section>
+
+<!-- COVERAGE -->
+<section class="coverage" id="cobertura">
+  <div class="coverage-text">
+    <div class="section-label reveal">Onde atuamos</div>
+    <h2 class="section-title reveal reveal-delay-1">FORTALEZA<br>E REGIÃO.</h2>
+    <p class="reveal reveal-delay-2">
+      Atendemos toda a capital cearense e os principais municípios da região metropolitana,
+      garantindo entregas rápidas em qualquer bairro.
+    </p>
+    <div class="city-list reveal reveal-delay-3">
+      <div class="city-item">Fortaleza — todos os bairros</div>
+      <div class="city-item">Caucaia</div>
+      <div class="city-item">Maracanaú</div>
+      <div class="city-item">Eusébio</div>
+      <div class="city-item">Aquiraz</div>
+      <div class="city-item">Pacatuba</div>
+      <div class="city-item">Horizonte</div>
+    </div>
+  </div>
+  <div class="coverage-map reveal reveal-delay-2">
+    <div class="map-bg"></div>
+    <div class="map-pulse"></div>
+    <div class="map-center">
+      <span class="map-icon">📍</span>
+      <div class="map-label">FORTALEZA</div>
+      <div class="map-sub">Ceará · Brasil</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-label reveal" style="justify-content:center">O que dizem</div>
+  <h2 class="section-title reveal reveal-delay-1" style="text-align:center">CLIENTES<br>SATISFEITOS</h2>
+
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Precisava entregar um contrato urgente no centro e o motoboy chegou em menos de 15 minutos. Incrível!"</p>
+      <div class="testi-author">
+        <div class="testi-av">👩</div>
+        <div>
+          <div class="testi-name">Ana Beatriz S.</div>
+          <div class="testi-loc">Aldeota, Fortaleza</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal reveal-delay-1">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Uso toda semana para buscar compras do mercado. O app é simples, o preço é justo e nunca falharam."</p>
+      <div class="testi-author">
+        <div class="testi-av">👨</div>
+        <div>
+          <div class="testi-name">Carlos M.</div>
+          <div class="testi-loc">Meireles, Fortaleza</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal reveal-delay-2">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"O sistema de múltiplas paradas é sensacional. Fiz 3 entregas de uma vez e ficou baratíssimo!"</p>
+      <div class="testi-author">
+        <div class="testi-av">👩</div>
+        <div>
+          <div class="testi-name">Fernanda L.</div>
+          <div class="testi-loc">Benfica, Fortaleza</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-banner reveal">
+  <div class="cta-text">
+    <h2>PRONTO PARA<br>COMEÇAR?</h2>
+    <p>Solicite sua primeira corrida agora mesmo.</p>
+  </div>
+  <a href="motoboy-app.html" class="btn-dark">
+    🏍️ Solicitar Corrida
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="nav-logo" style="margin-bottom:12px;">
+        <div class="nav-logo-icon">🏍</div>
+        MOTO<span class="dot">RUN</span>
+      </div>
+      <p>Entregas rápidas e seguras em Fortaleza e região metropolitana. Disponível 7 dias por semana.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Serviços</h4>
+      <ul>
+        <li><a href="#servicos">Entregas Rápidas</a></li>
+        <li><a href="#servicos">Documentos</a></li>
+        <li><a href="#servicos">Compras</a></li>
+        <li><a href="#servicos">Multi-paradas</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Empresa</h4>
+      <ul>
+        <li><a href="#como-funciona">Como Funciona</a></li>
+        <li><a href="#precos">Preços</a></li>
+        <li><a href="#cobertura">Cobertura</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Contato</h4>
+      <ul>
+        <li><a href="https://wa.me/5585999888735">WhatsApp</a></li>
+        <li><a href="motoboy-app.html">Solicitar Corrida</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 MotoRun · Todos os direitos reservados · Fortaleza, CE</p>
+    <a href="https://wa.me/5585999888735" class="footer-wpp">
+      💬 Falar no WhatsApp
+    </a>
+  </div>
+</footer>
+
+<script>
+/* ── SPEED LINES ── */
+const linesContainer = document.getElementById('speedLines');
+for (let i = 0; i < 12; i++) {
+  const s = document.createElement('span');
+  const top = 15 + Math.random() * 70;
+  s.style.cssText = `top:${top}%;--dur:${1.5+Math.random()*2.5}s;--delay:${Math.random()*3}s;width:${15+Math.random()*20}%`;
+  linesContainer.appendChild(s);
+}
+
+/* ── SCROLL REVEAL ── */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12, rootMargin:'0px 0px -40px 0px' });
+reveals.forEach(r => observer.observe(r));
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.background =
+    window.scrollY > 50 ? 'rgba(8,8,8,0.97)' : 'rgba(8,8,8,0.85)';
+});
+</script>
+</body>
+</html>
